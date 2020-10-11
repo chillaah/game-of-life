@@ -1,2 +1,2 @@
 # game-of-life
-creation of Jon Conway's game of life using c#
+creation of the lgame of life by legendary mathematician John Conway who passed away due to COVID
