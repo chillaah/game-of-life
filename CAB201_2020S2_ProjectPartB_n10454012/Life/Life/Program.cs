@@ -1609,7 +1609,7 @@ namespace Life
             WriteLine(String.Format("{0, 15} : {1, -10}", "Refresh Rate", maxUpdateRate + " updates/s"));
 
             // survival and birth
-            WriteLine(String.Format("{0, 15} : ", "Rules" + "S( " + survivalFirstValue + "..." +
+            WriteLine(String.Format("{0, 15} : {1, -10}", "Rules", "S( " + survivalFirstValue + "..." +
                       survivalLastValue + " ) B( " + birthFirstValue + "..." + birthLastValue + " )"));
 
             // neighborhood
@@ -1854,47 +1854,6 @@ namespace Life
 
             // revert grid window size and buffer to normal
             grid.RevertWindow();
-        }
-
-
-        static int periodicCalculation(int generationCountState, int rows, int columns, int[,] memoryarray)
-        {
-            //making variable at position of start of final array in steadystate array
-            int steadystate_x = generationCountState;
-            int count = 0;
-            int periodicity = 0;
-
-            //calculating generation at which steady state was reached
-            for (int x = 0; x < generationCountState + rows; x++)
-            {
-                if (count == (rows * columns))
-                {
-                    return periodicity - 1;
-                }
-
-                if (x % rows == 0)
-                {
-                    count = 0;
-                    periodicity++;
-                }
-
-                if (steadystate_x == generationCountState + (rows))
-                {
-                    steadystate_x = generationCountState;
-                }
-
-                for (int y = 0; y < columns; y++)
-                {
-                    if (memoryarray[x, y] == memoryarray[steadystate_x, y])
-                    {
-                        count++;
-                    }
-                }
-
-                steadystate_x++;
-            }
-
-            return 0;
         }
 
         // enumeration of repeating constants used in Main
