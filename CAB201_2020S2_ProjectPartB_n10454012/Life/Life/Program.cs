@@ -80,11 +80,6 @@ namespace Life
                 }
             }
 
-            if (neighbors > 0)
-            {
-                // WriteLine(rowCheck + "," + columnCheck + "-" + neighbors);
-            }
-
             // returning neighbors to rules of life
             return neighbors;
         }

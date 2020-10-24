@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "KlLmkcs780YNvdaAMsRduhwJMiFaJ4VH7ksIM8wv+//47RijUTFtOwUDlS6ulM1k3fKk7QJgs3FTEMWqnWEZoA==",
+  "dgSpecHash": "lOaVAGR+QvbgmEDFY/LJVHmDkPdE5qeOpSjfJOKhLh0rR5o7ky1muAv2phsjNj2mMp34qtSCXGBScqEOVeDPzA==",
   "success": true,
-  "projectFilePath": "/Users/chilla/Desktop/CAB201_2020S2_ProjectPartB_n10454012/Life/Display/Display.csproj",
+  "projectFilePath": "/Users/chilla/Desktop/game-of-life/CAB201_2020S2_ProjectPartB_n10454012/Life/Display/Display.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }
