@@ -1875,13 +1875,27 @@ namespace Life
         /// </summary>
         /// <param name="lifeGen"></param>
         /// <param name="fileName"></param>
-        static void WriteToFile(ref int[,] lifeGen, string fileName)
+        static void WriteToFile(ref int[,] lifeGen, ref string outputFile)
         {
-            for (int rowcheck = 0; rowcheck < lifeGen.GetLength(0); ++rowcheck)
-            {
-                for (int columncheck = 0; columncheck < lifeGen.GetLength(1); ++columncheck)
-                {
+            string path = outputFile;
 
+            if (!File.Exists(path))
+            {
+                // Create a file to write to.
+                using StreamWriter sw = File.CreateText(path);
+                sw.WriteLine("#version=2.0");
+
+                for (int rowcheck = 0; rowcheck < lifeGen.GetLength(0); ++rowcheck)
+                {
+                    for (int columncheck = 0; columncheck < lifeGen.GetLength(1); ++columncheck)
+                    {
+                        if (lifeGen[rowcheck, columncheck] == (int)CellConstants.Alive)
+                        {
+                            String stringToWrite = "(o) cell: " + rowcheck + ", " + columncheck;
+
+                            sw.WriteLine(stringToWrite);
+                        }
+                    }
                 }
             }
         }
@@ -1919,7 +1933,7 @@ namespace Life
             bool centreCount = false;
             bool ghostMode = true;
             int generationalMemory = 10;
-            string outputFile = "";
+            string outputFile = "/Users/chilla/Desktop/game-of-life/outputFile/output.seed";
             int survivalFirstValue = 2;
             int survivalLastValue = 3;
             int birthFirstValue = 3;
@@ -2134,6 +2148,8 @@ namespace Life
             }
 
             //TODO: CALL TO WRITE FUNCTION
+
+            WriteToFile(ref lifeGen, ref outputFile);
         }
     }
 }
