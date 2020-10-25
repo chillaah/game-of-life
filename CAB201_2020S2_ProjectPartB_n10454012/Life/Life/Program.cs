@@ -12,6 +12,13 @@ using static System.ConsoleKey;
 
 namespace Life
 {
+    // encapsulation has been used here as interface maps on to the classes as public methods
+    // make write to file private and reads also private
+
+    // the getneighbors method in abstract Ineighbors interface has been us    // the get neighbors method in Ineighbors worked differently in moore nieghborhood, von neumann neighborhood, depending on the nieghborhood requested in runtime which is runtime polymorphism
+
+    // implement throws from catches for exception handling
+
     interface INeighbors
     {
         int GetNeighbors(ref int[,] lifeGen, ref int rowCheck, ref int columnCheck,
@@ -536,119 +543,126 @@ namespace Life
         {
             if (args[index] == "--survival")
             {
-                survivalConstraints.Clear();
+                    survivalConstraints.Clear();
 
-                if (args[index + 2] == "...")
+                try
                 {
-                    try
+                    if (args[index + 2] == "...")
                     {
-                        if (!int.TryParse(args[index + 1], out survivalFirstValue) && !int.TryParse(args[index + 3], out survivalLastValue))
+                        try
                         {
-                            survivalFirstValue = 2;
-                            survivalLastValue = 3;
-
-                            success = false;
-                            Error.WriteLine("first value and/or last value of survival must be an integer(s)");
-                        }
-
-                        else
-                        {
-                            if (survivalFirstValue < survivalLastValue)
+                            if (!int.TryParse(args[index + 1], out survivalFirstValue) && !int.TryParse(args[index + 3], out survivalLastValue))
                             {
                                 survivalFirstValue = 2;
                                 survivalLastValue = 3;
 
                                 success = false;
-                                Error.WriteLine("first value of survival must not be greater than the second value");
+                                Error.WriteLine("first value and/or last value of survival must be an integer(s)");
                             }
 
-                            else if (survivalFirstValue < 0)
-                            {
-                                survivalFirstValue = 2;
-                                survivalLastValue = 3;
-
-                                success = false;
-                                Error.WriteLine("first value of survival must be a positive non-zero value");
-                            }
-                        }
-
-                        for (int i = survivalFirstValue; i <= survivalLastValue; ++i)
-                        {
-                            survivalConstraints.Add(i);
-                        }
-                    }
-
-                    catch
-                    {
-                        survivalFirstValue = 2;
-                        survivalLastValue = 3;
-
-                        for (int i = survivalFirstValue; i <= survivalLastValue; ++i)
-                        {
-                            survivalConstraints.Add(i);
-                        }
-
-                        success = false;
-                        Error.WriteLine("first value of survival must be a positive non-zero value");
-                    }
-                }
-            }
-
-            else
-            {
-                for (int i = index + 1; i < args.Length; ++i)
-                {
-                    try
-                    {
-                        if (int.TryParse(args[index + 1], out int survivalValue))
-                        {
-                            if (!(survivalValue > 1))
-                            {
-                                survivalFirstValue = 2;
-                                survivalLastValue = 3;
-
-                                success = false;
-                                Error.WriteLine("survival must be a positive non-zero value");
-                            }
                             else
                             {
-                                survivalFirstValue = survivalValue;
-                                survivalLastValue = survivalValue;
+                                if (survivalFirstValue < survivalLastValue)
+                                {
+                                    survivalFirstValue = 2;
+                                    survivalLastValue = 3;
+
+                                    success = false;
+                                    Error.WriteLine("first value of survival must not be greater than the second value");
+                                }
+
+                                else if (survivalFirstValue < 0)
+                                {
+                                    survivalFirstValue = 2;
+                                    survivalLastValue = 3;
+
+                                    success = false;
+                                    Error.WriteLine("first value of survival must be a positive non-zero value");
+                                }
                             }
 
-                            for (int j = survivalFirstValue; j <= survivalLastValue; ++j)
+                            for (int i = survivalFirstValue; i <= survivalLastValue; ++i)
                             {
                                 survivalConstraints.Add(i);
                             }
                         }
-                        else
+
+                        catch (Exception e)
                         {
                             survivalFirstValue = 2;
                             survivalLastValue = 3;
 
-                            for (int j = survivalFirstValue; j <= survivalLastValue; ++j)
+                            for (int i = survivalFirstValue; i <= survivalLastValue; ++i)
                             {
-                                survivalConstraints.Add(j);
+                                survivalConstraints.Add(i);
                             }
 
                             success = false;
-                            Error.WriteLine("survival must be an integer");
+                            Error.WriteLine("first value of survival must be a positive non-zero value");
                         }
                     }
-
-                    catch
+                    else
                     {
-                        survivalFirstValue = 2;
-                        survivalLastValue = 3;
-
-                        for (int j = survivalFirstValue; j <= survivalLastValue; ++j)
+                        for (int i = index + 1; i < args.Length; ++i)
                         {
-                            survivalConstraints.Add(j);
-                        }
+                            try
+                            {
+                                if (int.TryParse(args[index + 1], out int survivalValue))
+                                {
+                                    if (!(survivalValue > 1))
+                                    {
+                                        survivalFirstValue = 2;
+                                        survivalLastValue = 3;
 
-                        success = false;
-                        Error.WriteLine("survival was not povided");
+                                        success = false;
+                                        Error.WriteLine("survival must be a positive non-zero value");
+                                    }
+                                    else
+                                    {
+                                        survivalFirstValue = survivalValue;
+                                        survivalLastValue = survivalValue;
+                                    }
+
+                                    for (int j = survivalFirstValue; j <= survivalLastValue; ++j)
+                                    {
+                                        survivalConstraints.Add(i);
+                                    }
+                                }
+                                else
+                                {
+                                    survivalFirstValue = 2;
+                                    survivalLastValue = 3;
+
+                                    for (int j = survivalFirstValue; j <= survivalLastValue; ++j)
+                                    {
+                                        survivalConstraints.Add(j);
+                                    }
+
+                                    success = false;
+                                    Error.WriteLine("survival must be an integer");
+                                }
+                            }
+
+                            catch
+                            {
+                                survivalFirstValue = 2;
+                                survivalLastValue = 3;
+
+                                for (int j = survivalFirstValue; j <= survivalLastValue; ++j)
+                                {
+                                    survivalConstraints.Add(j);
+                                }
+
+                                success = false;
+                                Error.WriteLine("survival was not povided");
+                            }
+                        }
                     }
+                }
+
+                catch (IndexOutOfRangeException e)
+                {
+                    Error.WriteLine("Invalid Length of Arguments");
                 }
             }
 
@@ -1891,7 +1905,7 @@ namespace Life
                     {
                         if (lifeGen[rowcheck, columncheck] == (int)CellConstants.Alive)
                         {
-                            String stringToWrite = "(o) cell: " + rowcheck + ", " + columncheck;
+                            string stringToWrite = "(o) cell: " + rowcheck + ", " + columncheck;
 
                             sw.WriteLine(stringToWrite);
                         }
