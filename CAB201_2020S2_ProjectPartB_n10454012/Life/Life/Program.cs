@@ -6,7 +6,6 @@ using System.Globalization;
 using System.Collections.Generic;
 using static System.Math;
 using static System.Console;
-using static System.Convert;
 using static System.ConsoleKey;
 
 namespace Life
@@ -115,9 +114,12 @@ namespace Life
 
                     // adding nieghbhors if they exist
                     if (rowNumberCurrent >= 0 && rowNumberCurrent < lifeGen.GetLength(0) &&
-                        columnNumberCurrent >= 0 && columnNumberCurrent < lifeGen.GetLength(1))
+                         columnNumberCurrent >= 0 && columnNumberCurrent < lifeGen.GetLength(1))
                     {
-                        neighbors += lifeGen[rowNumberCurrent, columnNumberCurrent];
+                        if ((Pow(rowNumberCurrent, 2) + Pow(columnNumberCurrent, 2)) <= Pow(neighborhoodOrder, 2))
+                        {
+                            neighbors += lifeGen[rowNumberCurrent, columnNumberCurrent];
+                        }
                     }
 
                     // if operating in periodic mode
@@ -148,11 +150,6 @@ namespace Life
                         neighbors += lifeGen[rowNumberCurrent, columnNumberCurrent];
                     }
                 }
-            }
-
-            if (neighbors > 0)
-            {
-                // WriteLine(rowCheck + "," + columnCheck + "-" + neighbors);
             }
 
             // returning neighbors to rules of life
@@ -231,7 +228,7 @@ namespace Life
     class Program
     {
         /// <summary>
-        /// method fo checking validity
+        /// method for checking validity
         /// </summary>
         /// <param name="args"></param>
         /// <param name="success"></param>
@@ -1192,19 +1189,19 @@ namespace Life
         }
 
         /// <summary>
-        /// 
+        /// reading cell seeds
         /// </summary>
         /// <param name="array"></param>
         /// <param name="row"></param>
         /// <param name="column"></param>
         /// <param name="state"></param>
-        static void cellseed(ref int[,] array, int row, int column, int state) 
+        static void CellSeed(ref int[,] seedArray, int row, int column, int state) 
         {
-            array[row, column] = state;
+            seedArray[row, column] = state;
         }
 
         /// <summary>
-        /// 
+        /// reading rectangular seeds
         /// </summary>
         /// <param name="array"></param>
         /// <param name="row"></param>
@@ -1212,19 +1209,19 @@ namespace Life
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <param name="state"></param>
-        static void rectseed(ref int[,] array, int row, int column, int width,  int height, int state)
+        static void RectSeed(ref int[,] seedArray, int row, int column, int width,  int height, int state)
         {
-            for (int x = row; x <= height; x++) 
+            for (int x = row; x <= height; ++x) 
             {
-                for (int y = column; y <= width; y++)
+                for (int y = column; y <= width; ++y)
                 {
-                    array[x, y] = state;
+                    seedArray[x, y] = state;
                 }
             }
         }
 
         /// <summary>
-        /// 
+        /// reading ellipse seeds
         /// </summary>
         /// <param name="array"></param>
         /// <param name="row"></param>
@@ -1232,45 +1229,28 @@ namespace Life
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <param name="state"></param>
-        static void ellipseseed(ref int[,] array, int row, int column, int width, int height, int state)
+        static void EllipseSeed(ref int[,] seedArray, int row, int column, int width, int height, int state)
         {
-            //Console.WriteLine(row);
-            //Console.WriteLine(column);
-            //Console.WriteLine(width);
-            //Console.WriteLine(height);
-            //find mid point location if given coordinates
-            WriteLine(row + "......" + column + "......" + width + "...." + height + "...." + state);
+            // determining the centre
+            double centreX = (double)(row + height) / 2;
+            double centreY = (double)(width + column) / 2;
 
-            //find mid point location if given coordinates
-            double midx = (double)(height + row) / 2;
-            double midy = (double)(width + column) / 2;
-
-            //checking every cell in the array if the cell fits the required rule
-            for (int i = 0; i < array.GetLength(0); i++)
+            // checking with the ellipse rule
+            for (int i = 0; i < seedArray.GetLength(0); ++i)
             {
-                for (int j = 0; j < array.GetLength(1); j++)
+                for (int j = 0; j < seedArray.GetLength(1); ++j)
                 {
-                    /////////////////////ellipse equation///////////////////
+                    double xPart = 4 * Math.Pow(i - centreX, 2) / Math.Pow(height - row + 1, 2);
 
-                    //////////////////////height section of equation////////
-                    double bracketsx = Math.Pow(i - midx, 2);
-                    double numerx = (4 * bracketsx);
-                    double denomx = Math.Pow(height - row + 1, 2);
+                    double yPart = 4 * Math.Pow(j - centreY, 2) / Math.Pow(width - column + 1, 2);
 
-                    ///////////////////////width section of equation///////
-                    double bracketsy = Math.Pow(j - midy, 2);
-                    double numery = (4 * bracketsy);
-                    double denomy = Math.Pow(width - column + 1, 2);
+                    double ellipseResult = xPart + yPart;
 
-                    ////////////////////////////combine both parts////////
-                    double result = ((numerx / denomx) + (numery / denomy));
 
-                    //if result is less than or equal to 1 then the cell is within the ellipse
-                    if (result <= 1)
+                    if (ellipseResult <= 1)
                     {
-                        array[i, j] = state;
+                        seedArray[i, j] = state;
                     }
-
                 }
             }
 
@@ -1299,39 +1279,43 @@ namespace Life
 
                     //*************
                     seedFile.ReadLine();
-                    //Read whole of seed file
+
+                    // reading the whole seed file
                     string readall = seedFile.ReadToEnd().Trim();
 
-                    //split by number of co-ordinates
-                    string[] lines = readall.Split('\n');
-                    string[] splited = new string[lines.Length];
+                    // split by number of co-ordinates
+                    string[] linesplit = readall.Split('\n');
 
-                    int[] x_cor = new int[lines.Length];
-                    int[] y_cor = new int[lines.Length];
-                    string[] state = new string[lines.Length];
-                    int[] height = new int[lines.Length];
-                    int[] width = new int[lines.Length];
+                    // string array with split line length
+                    string[] linesLength = new string[linesplit.Length];
+
+
+                    int[] coordinateX = new int[linesplit.Length];
+                    int[] coordinateY = new int[linesplit.Length];
+                    string[] state = new string[linesplit.Length];
+                    int[] height = new int[linesplit.Length];
+                    int[] width = new int[linesplit.Length];
 
                     //Assigning values from seed to arrays
-                    for (int x = 0; x < lines.Length; x++)
+                    for (int x = 0; x < linesplit.Length; x++)
                     {
 
                         //split each line to their x and y
-                        splited[x] = lines[x].Split(",")[0];
-                        y_cor[x] = int.Parse(lines[x].Split(",")[1]);
+                        linesLength[x] = linesplit[x].Split(",")[0];
+                        coordinateY[x] = int.Parse(linesplit[x].Split(",")[1]);
 
-                        state[x] = splited[x].Split(":")[0];
-                        x_cor[x] = int.Parse(splited[x].Split(":")[1]);
+                        state[x] = linesLength[x].Split(":")[0];
+                        coordinateX[x] = int.Parse(linesLength[x].Split(":")[1]);
 
 
-                        if (!lines[x].Contains("cell"))
+                        if (!linesplit[x].Contains("cell"))
                         {
-                            height[x] = int.Parse(lines[x].Split(",")[2]);
-                            width[x] = int.Parse(lines[x].Split(",")[3]);
+                            height[x] = int.Parse(linesplit[x].Split(",")[2]);
+                            width[x] = int.Parse(linesplit[x].Split(",")[3]);
                         }
                     }
 
-                    for (int x = 0; x < x_cor.Length; x++)
+                    for (int x = 0; x < coordinateX.Length; x++)
                     {
                         if (state[x].Contains("cell"))
                         {
@@ -1342,30 +1326,27 @@ namespace Life
                         {
                             if (state[x].Contains("(o)"))
                             {
-                                rectseed(ref lifeGen, x_cor[x], y_cor[x], width[x], height[x], 1);
+                                RectSeed(ref lifeGen, coordinateX[x], coordinateY[x], width[x], height[x], 1);
                             }
                             else
                             {
-                                rectseed(ref lifeGen, x_cor[x], y_cor[x], width[x], height[x], 0);
+                                RectSeed(ref lifeGen, coordinateX[x], coordinateY[x], width[x], height[x], 0);
                             }
                         }
                         else
                         {
                             if (state[x].Contains("(o)"))
                             {
-                                ellipseseed(ref lifeGen, x_cor[x], y_cor[x], width[x], height[x], 1);
+                                EllipseSeed(ref lifeGen, coordinateX[x], coordinateY[x], width[x], height[x], 1);
                             }
                             else
                             {
-                                ellipseseed(ref lifeGen, x_cor[x], y_cor[x], width[x], height[x], 0);
+                                EllipseSeed(ref lifeGen, coordinateX[x], coordinateY[x], width[x], height[x], 0);
                             }
                         }
                     }
                 }
                 //*************
-
-
-
 
                 //    string fileContents = "";
 
@@ -1613,8 +1594,17 @@ namespace Life
                       survivalLastValue + " ) B( " + birthFirstValue + "..." + birthLastValue + " )"));
 
             // neighborhood
-            WriteLine(String.Format("{0, 15} : {1, -10}", "Neighborhood", UppercaseFirst(neighborhoodType) +
-                      " (" + neighborhoodOrder + ")"));
+            if (neighborhoodType == "moore")
+            {
+                WriteLine(String.Format("{0, 15} : {1, -10}", "Neighborhood", UppercaseFirst(neighborhoodType) +
+                          " (" + neighborhoodOrder + ")"));
+            }
+            else
+            {
+                WriteLine(String.Format("{0, 15} : {1, -10}", "Neighborhood", UppercaseFirst(neighborhoodType).Substring(0,3) +
+                          UppercaseFirst(neighborhoodType).Substring(4) + " (" + neighborhoodOrder + ")"));
+            }
+            
 
             // periodic mode
             if (periodicMode == true)
@@ -1876,17 +1866,17 @@ namespace Life
         static void Main(string[] args)
         {
             // declaring argument variables
-            int rows = 48;
-            int columns = 48;
-            bool periodicMode = true;
+            int rows = 16;
+            int columns = 16;
+            bool periodicMode = false;
             double randomFactor = 0.5;
-            string inputFile = "";
-            int generations = 300;
-            double maxUpdateRate = 15;
+            string inputFile = "/Users/chilla/Desktop/game-of-life/CAB201_2020S2_ProjectPartB_n10454012/Seeds/glider.seed";
+            int generations = 50;
+            double maxUpdateRate = 5;
             bool stepMode = false;
-            string neighborhoodType = "moore";
-            int neighborhoodOrder = 5;
-            bool centreCount = true;
+            string neighborhoodType = "vonneumann";
+            int neighborhoodOrder = 1;
+            bool centreCount = false;
             bool ghostMode = false;
             int generationalMemory = 16;
             string outputFile = "";
