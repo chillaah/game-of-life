@@ -24,19 +24,42 @@ namespace Life
     /// </summary>
     interface INeighbors
     {
+        /// <summary>
+        /// method to get the nieghbors
+        /// </summary>
+        /// <param name="lifeGen"></param>
+        /// <param name="rowCheck"></param>
+        /// <param name="columnCheck"></param>
+        /// <param name="periodicMode"></param>
+        /// <param name="neighborhoodOrder"></param>
+        /// <param name="centreCount"></param>
+        /// <returns></returns>
         int GetNeighbors(ref int[,] lifeGen, ref int rowCheck, ref int columnCheck,
                          ref bool periodicMode, ref int neighborhoodOrder, ref bool centreCount);
     }
 
+    /// <summary>
+    /// class of moore neighborhood implemented from neighbor identifying interface
+    /// </summary>
     class MooreNeighhborhood : INeighbors
     {
+        /// <summary>
+        /// method to get the neighbors
+        /// </summary>
+        /// <param name="lifeGen"></param>
+        /// <param name="rowCheck"></param>
+        /// <param name="columnCheck"></param>
+        /// <param name="periodicMode"></param>
+        /// <param name="neighborhoodOrder"></param>
+        /// <param name="centreCount"></param>
+        /// <returns></returns>
         public int GetNeighbors(ref int[,] lifeGen, ref int rowCheck, ref int columnCheck,
                                 ref bool periodicMode, ref int neighborhoodOrder, ref bool centreCount)
         {
             // initializing neighbors
             int neighbors = 0;
 
-            // neighbhor cell boundaries
+            // moore neighbhor cell boundaries
             int PreviousCell = -1 * neighborhoodOrder;
             int NextCell = neighborhoodOrder;
 
@@ -96,15 +119,28 @@ namespace Life
         }
     }
 
+    /// <summary>
+    /// class of von veumann neighborhood implemented from neighbor identifying interface
+    /// </summary>
     class VonNeumannNeighhborhood : INeighbors
     {
+        /// <summary>
+        /// method to get the neighbors
+        /// </summary>
+        /// <param name="lifeGen"></param>
+        /// <param name="rowCheck"></param>
+        /// <param name="columnCheck"></param>
+        /// <param name="periodicMode"></param>
+        /// <param name="neighborhoodOrder"></param>
+        /// <param name="centreCount"></param>
+        /// <returns></returns>
         public int GetNeighbors(ref int[,] lifeGen, ref int rowCheck, ref int columnCheck,
                                 ref bool periodicMode, ref int neighborhoodOrder, ref bool centreCount)
         {
             // initializing neighbors
             int neighbors = 0;
 
-            // neighbhor cell boundaries
+            // von neumann neighbhor cell boundaries
             int PreviousCell = -1 * neighborhoodOrder;
             int NextCell = neighborhoodOrder;
 
@@ -124,6 +160,7 @@ namespace Life
                     int rowNumberCurrent = rowCheck + rowCoordinate;
                     int columnNumberCurrent = columnCheck + columnCoordinate;
 
+                    // temporary boolean variable for neighbor checking
                     bool proceed = false;
 
                     // adding nieghbhors if they exist
@@ -160,7 +197,8 @@ namespace Life
                         proceed = true;
                     }
 
-                    if (proceed)
+                    // von neumann neighbor counting logic
+                    if (proceed == true)
                     {
                         if ((Pow(rowCoordinate, 2) + Pow(columnCoordinate, 2)) <= Pow(neighborhoodOrder, 2))
                         {
@@ -176,8 +214,21 @@ namespace Life
         }
     }
 
+    /// <summary>
+    /// class of previous neighborhood implemented from neighbor identifying interface
+    /// </summary>
     class OldNeighbors : INeighbors
     {
+        /// <summary>
+        /// method to get the neighbors
+        /// </summary>
+        /// <param name="lifeGen"></param>
+        /// <param name="rowCheck"></param>
+        /// <param name="columnCheck"></param>
+        /// <param name="periodicMode"></param>
+        /// <param name="neighborhoodOrder"></param>
+        /// <param name="centreCount"></param>
+        /// <returns></returns>
         public int GetNeighbors(ref int[,] lifeGen, ref int rowCheck, ref int columnCheck, ref bool periodicMode,
                                 ref int neighborhoodOrder, ref bool centreCount)
         {
@@ -331,6 +382,7 @@ namespace Life
         /// <param name="memoryQueue"></param>
         static bool AddToQueue(int[,] lifeGen, ref int limit, Queue<string> memoryQueue)
         {
+            // calling from array to string conversion
             string list = GetStringFromArray(lifeGen);
             
             if (memoryQueue.Contains(list))
@@ -344,18 +396,24 @@ namespace Life
             }
 
             memoryQueue.Enqueue(list);
-
             return false;
         }
-
-        public static int[,] GetArrayFromString(string arrayText, int upperLen, int lowerLen)         {             string[] parsed = arrayText.Split(",");             int[,] output = new int[upperLen, lowerLen];             for (var upper = 0; upper < upperLen; upper++)                 for (var lower = 0; lower < lowerLen; lower++)                     output[upper, lower] = int.Parse(parsed[(upper * lowerLen) + lower]);             return output;         }
 
         /// <summary>
         /// converting from string to array
         /// </summary>
+        /// <param name="arrayText"></param>
+        /// <param name="upperLen"></param>
+        /// <param name="lowerLen"></param>
+        /// <returns></returns>
+        public static int[,] GetArrayFromString(string arrayText, int upperLen, int lowerLen)         {             // method souce: - stack overflow             string[] parsed = arrayText.Split(",");             int[,] output = new int[upperLen, lowerLen];              for (var upper = 0; upper < upperLen; upper++)                 for (var lower = 0; lower < lowerLen; lower++)                      output[upper, lower] = int.Parse(parsed[(upper * lowerLen) + lower]);              return output;         }
+
+        /// <summary>
+        /// converting from array to string
+        /// </summary>
         /// <param name="lst"></param>
         /// <returns></returns>
-        public static string GetStringFromArray(int[,] lst)         {             return string.Join(',', lst.Cast<int>());         } 
+        public static string GetStringFromArray(int[,] lst)         {             // method source: - stack overflow             return string.Join(',', lst.Cast<int>());         } 
         /// <summary>
         /// output file check
         /// </summary>
@@ -408,13 +466,13 @@ namespace Life
             // --memory args
             if (args[index] == "--generations")
             {
-                // checking if paramter provided
+                // checking if parameter provided
                 try
                 {
                     // if parameter is integer, store generations
                     if (int.TryParse(args[index + 1], out generationalMemory))
                     {
-                        // if integer > 0, keep generations
+                        // if integer >= 4 and <= 512, keep generational memory
                         // else display error and assign defualt generations
                         if (!((4 <= generationalMemory) && (generationalMemory <= 512)))
                         {
@@ -433,7 +491,8 @@ namespace Life
                         Error.WriteLine("The value must be an integer");
                     }
                 }
-                // else display error and assign defult generations
+                // no parameter provided
+                // display error and assign defult generations
                 catch
                 {
                     generationalMemory = 16;
@@ -544,16 +603,19 @@ namespace Life
                                      ref int survivalFirstValue, ref int survivalLastValue,
                                      ref int birthFirstValue, ref int birthLastValue)
         {
+            // --survival args
             if (args[index] == "--survival")
             {
-                    survivalConstraints.Clear();
+                survivalConstraints.Clear();
 
                 try
                 {
+                    // checking if the range operator is present
                     if (args[index + 2] == "...")
                     {
                         try
                         {
+                            // checking i survival range values are provided are integrers
                             if (!int.TryParse(args[index + 1], out survivalFirstValue) && !int.TryParse(args[index + 3], out survivalLastValue))
                             {
                                 survivalFirstValue = 2;
@@ -562,10 +624,11 @@ namespace Life
                                 success = false;
                                 Error.WriteLine("first value and/or last value of survival must be an integer(s)");
                             }
-
+                            // if so checkin for the boundry conditions
                             else
                             {
-                                if (survivalFirstValue < survivalLastValue)
+                                // lower bound can't be greater than the upper bound
+                                if (survivalFirstValue > survivalLastValue)
                                 {
                                     survivalFirstValue = 2;
                                     survivalLastValue = 3;
@@ -574,6 +637,7 @@ namespace Life
                                     Error.WriteLine("first value of survival must not be greater than the second value");
                                 }
 
+                                // lower bound must a positive non-zero integer
                                 else if (survivalFirstValue < 0)
                                 {
                                     survivalFirstValue = 2;
