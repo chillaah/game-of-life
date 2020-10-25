@@ -1,25 +1,31 @@
 {
   "format": 1,
   "restore": {
-    "/Users/chilla/Desktop/game-of-life/CAB201_2020S2_ProjectPartB_n10454012/Life/Life/Life.csproj": {}
+    "C:\\Users\\n10454012\\Desktop\\game-of-life\\CAB201_2020S2_ProjectPartB_n10454012\\Life\\Life\\Life.csproj": {}
   },
   "projects": {
-    "/Users/chilla/Desktop/game-of-life/CAB201_2020S2_ProjectPartB_n10454012/Life/Display/Display.csproj": {
+    "C:\\Users\\n10454012\\Desktop\\game-of-life\\CAB201_2020S2_ProjectPartB_n10454012\\Life\\Display\\Display.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/chilla/Desktop/game-of-life/CAB201_2020S2_ProjectPartB_n10454012/Life/Display/Display.csproj",
+        "projectUniqueName": "C:\\Users\\n10454012\\Desktop\\game-of-life\\CAB201_2020S2_ProjectPartB_n10454012\\Life\\Display\\Display.csproj",
         "projectName": "display",
-        "projectPath": "/Users/chilla/Desktop/game-of-life/CAB201_2020S2_ProjectPartB_n10454012/Life/Display/Display.csproj",
-        "packagesPath": "/Users/chilla/.nuget/packages/",
-        "outputPath": "/Users/chilla/Desktop/game-of-life/CAB201_2020S2_ProjectPartB_n10454012/Life/Display/obj/",
+        "projectPath": "C:\\Users\\n10454012\\Desktop\\game-of-life\\CAB201_2020S2_ProjectPartB_n10454012\\Life\\Display\\Display.csproj",
+        "packagesPath": "C:\\Users\\n10454012\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\n10454012\\Desktop\\game-of-life\\CAB201_2020S2_ProjectPartB_n10454012\\Life\\Display\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Microsoft\\Xamarin\\NuGet\\"
+        ],
         "configFilePaths": [
-          "/Users/chilla/.config/NuGet/NuGet.Config"
+          "C:\\Users\\n10454012\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp3.1"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -50,33 +56,39 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.302/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.100\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "/Users/chilla/Desktop/game-of-life/CAB201_2020S2_ProjectPartB_n10454012/Life/Life/Life.csproj": {
+    "C:\\Users\\n10454012\\Desktop\\game-of-life\\CAB201_2020S2_ProjectPartB_n10454012\\Life\\Life\\Life.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/chilla/Desktop/game-of-life/CAB201_2020S2_ProjectPartB_n10454012/Life/Life/Life.csproj",
+        "projectUniqueName": "C:\\Users\\n10454012\\Desktop\\game-of-life\\CAB201_2020S2_ProjectPartB_n10454012\\Life\\Life\\Life.csproj",
         "projectName": "life",
-        "projectPath": "/Users/chilla/Desktop/game-of-life/CAB201_2020S2_ProjectPartB_n10454012/Life/Life/Life.csproj",
-        "packagesPath": "/Users/chilla/.nuget/packages/",
-        "outputPath": "/Users/chilla/Desktop/game-of-life/CAB201_2020S2_ProjectPartB_n10454012/Life/Life/obj/",
+        "projectPath": "C:\\Users\\n10454012\\Desktop\\game-of-life\\CAB201_2020S2_ProjectPartB_n10454012\\Life\\Life\\Life.csproj",
+        "packagesPath": "C:\\Users\\n10454012\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\n10454012\\Desktop\\game-of-life\\CAB201_2020S2_ProjectPartB_n10454012\\Life\\Life\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Microsoft\\Xamarin\\NuGet\\"
+        ],
         "configFilePaths": [
-          "/Users/chilla/.config/NuGet/NuGet.Config"
+          "C:\\Users\\n10454012\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp3.1"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "netcoreapp3.1": {
             "projectReferences": {
-              "/Users/chilla/Desktop/game-of-life/CAB201_2020S2_ProjectPartB_n10454012/Life/Display/Display.csproj": {
-                "projectPath": "/Users/chilla/Desktop/game-of-life/CAB201_2020S2_ProjectPartB_n10454012/Life/Display/Display.csproj"
+              "C:\\Users\\n10454012\\Desktop\\game-of-life\\CAB201_2020S2_ProjectPartB_n10454012\\Life\\Display\\Display.csproj": {
+                "projectPath": "C:\\Users\\n10454012\\Desktop\\game-of-life\\CAB201_2020S2_ProjectPartB_n10454012\\Life\\Display\\Display.csproj"
               }
             }
           }
@@ -104,7 +116,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.302/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.100\\RuntimeIdentifierGraph.json"
         }
       }
     }

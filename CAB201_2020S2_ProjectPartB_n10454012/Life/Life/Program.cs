@@ -19,6 +19,9 @@ namespace Life
 
     // implement throws from catches for exception handling
 
+    /// <summary>
+    /// interface for the get neighbors method
+    /// </summary>
     interface INeighbors
     {
         int GetNeighbors(ref int[,] lifeGen, ref int rowCheck, ref int columnCheck,
