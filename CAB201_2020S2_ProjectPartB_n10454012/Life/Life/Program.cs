@@ -1,11 +1,13 @@
 using System;
 using Display;
 using System.IO;
+using System.Linq;
 using System.Diagnostics;
 using System.Globalization;
 using System.Collections.Generic;
 using static System.Math;
 using static System.Console;
+using static System.Convert;
 using static System.ConsoleKey;
 
 namespace Life
@@ -112,14 +114,13 @@ namespace Life
                     int rowNumberCurrent = rowCheck + rowCoordinate;
                     int columnNumberCurrent = columnCheck + columnCoordinate;
 
+                    bool proceed = false;
+
                     // adding nieghbhors if they exist
                     if (rowNumberCurrent >= 0 && rowNumberCurrent < lifeGen.GetLength(0) &&
                          columnNumberCurrent >= 0 && columnNumberCurrent < lifeGen.GetLength(1))
                     {
-                        if ((Pow(rowNumberCurrent, 2) + Pow(columnNumberCurrent, 2)) <= Pow(neighborhoodOrder, 2))
-                        {
-                            neighbors += lifeGen[rowNumberCurrent, columnNumberCurrent];
-                        }
+                        proceed = true;
                     }
 
                     // if operating in periodic mode
@@ -146,9 +147,17 @@ namespace Life
                             columnNumberCurrent += lifeGen.GetLength(1);
                         }
 
-                        // adding neighbbhors if they exist
-                        neighbors += lifeGen[rowNumberCurrent, columnNumberCurrent];
+                        proceed = true;
                     }
+
+                    if (proceed)
+                    {
+                        if ((Pow(rowCoordinate, 2) + Pow(columnCoordinate, 2)) <= Pow(neighborhoodOrder, 2))
+                        {
+                            neighbors += lifeGen[rowNumberCurrent, columnNumberCurrent];
+                        }
+                    }
+
                 }
             }
 
@@ -305,6 +314,39 @@ namespace Life
         }
 
         /// <summary>
+        /// steady state implementation
+        /// </summary>
+        /// <param name="lifeGen"></param>
+        /// <param name="limit"></param>
+        /// <param name="memoryQueue"></param>
+        static bool AddToQueue(int[,] lifeGen, ref int limit, Queue<string> memoryQueue)
+        {
+            string list = GetStringFromArray(lifeGen);
+            
+            if (memoryQueue.Contains(list))
+            {
+                return true;
+            }
+
+            if (memoryQueue.Count == limit)
+            {
+                memoryQueue.Dequeue();
+            }
+
+            memoryQueue.Enqueue(list);
+
+            return false;
+        }
+
+        public static int[,] GetArrayFromString(string arrayText, int upperLen, int lowerLen)         {             string[] parsed = arrayText.Split(",");             int[,] output = new int[upperLen, lowerLen];             for (var upper = 0; upper < upperLen; upper++)                 for (var lower = 0; lower < lowerLen; lower++)                     output[upper, lower] = int.Parse(parsed[(upper * lowerLen) + lower]);             return output;         }
+
+        /// <summary>
+        /// converting from string to array
+        /// </summary>
+        /// <param name="lst"></param>
+        /// <returns></returns>
+        public static string GetStringFromArray(int[,] lst)         {             return string.Join(',', lst.Cast<int>());         } 
+        /// <summary>
         /// output file check
         /// </summary>
         /// <param name="args"></param>
@@ -402,7 +444,7 @@ namespace Life
         /// <param name="birth"></param>
         /// <param name="ghost"></param>
         static void CellStates(int state, ref int spot, int cell, List<int> survival,
-                               List<int> birth, bool ghostMode)
+                               List<int> birth, ref bool ghostMode)
         {
             //checking for the number of neighbors depending on the cell state
             if (cell != (int)CellConstants.Alive)
@@ -1177,6 +1219,11 @@ namespace Life
             }
         }
 
+        /// <summary>
+        /// convert first letter of string to uppercase
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         static string UppercaseFirst(string s)
         {
             if (string.IsNullOrEmpty(s))
@@ -1267,7 +1314,7 @@ namespace Life
         /// <param name="Alive"></param>
         static void FileContents(ref int[,] lifeGen, ref string inputFile,
                                  ref int rows, ref int columns, ref double randomFactor,
-                                 int Alive)
+                                 int Alive, ref bool fileMode, ref bool success)
         {
             // reading from seed file coordinates
             if (inputFile.Contains(".seed"))
@@ -1277,241 +1324,180 @@ namespace Life
                 {
                     StreamReader seedFile = new StreamReader(inputFile);
 
-                    //*************
-                    seedFile.ReadLine();
-
-                    // reading the whole seed file
-                    string readall = seedFile.ReadToEnd().Trim();
-
-                    // split by number of co-ordinates
-                    string[] linesplit = readall.Split('\n');
-
-                    // string array with split line length
-                    string[] linesLength = new string[linesplit.Length];
-
-
-                    int[] coordinateX = new int[linesplit.Length];
-                    int[] coordinateY = new int[linesplit.Length];
-                    string[] state = new string[linesplit.Length];
-                    int[] height = new int[linesplit.Length];
-                    int[] width = new int[linesplit.Length];
-
-                    //Assigning values from seed to arrays
-                    for (int x = 0; x < linesplit.Length; x++)
+                    if (seedFile.ReadLine() == "#version=2.0")
                     {
 
-                        //split each line to their x and y
-                        linesLength[x] = linesplit[x].Split(",")[0];
-                        coordinateY[x] = int.Parse(linesplit[x].Split(",")[1]);
+                        // reading the whole seed file
+                        string readall = seedFile.ReadToEnd().Trim();
 
-                        state[x] = linesLength[x].Split(":")[0];
-                        coordinateX[x] = int.Parse(linesLength[x].Split(":")[1]);
+                        // split by number of co-ordinates
+                        string[] linesplit = readall.Split('\n');
+
+                        // string array with split line length
+                        string[] linesLength = new string[linesplit.Length];
 
 
-                        if (!linesplit[x].Contains("cell"))
+                        int[] coordinateX = new int[linesplit.Length];
+                        int[] coordinateY = new int[linesplit.Length];
+                        string[] state = new string[linesplit.Length];
+                        int[] height = new int[linesplit.Length];
+                        int[] width = new int[linesplit.Length];
+
+                        //Assigning values from seed to arrays
+                        for (int x = 0; x < linesplit.Length; x++)
                         {
-                            height[x] = int.Parse(linesplit[x].Split(",")[2]);
-                            width[x] = int.Parse(linesplit[x].Split(",")[3]);
-                        }
-                    }
 
-                    for (int x = 0; x < coordinateX.Length; x++)
-                    {
-                        if (state[x].Contains("cell"))
-                        {
+                            //split each line to their x and y
+                            linesLength[x] = linesplit[x].Split(",")[0];
+                            coordinateY[x] = int.Parse(linesplit[x].Split(",")[1]);
 
-                        }
+                            state[x] = linesLength[x].Split(":")[0];
+                            coordinateX[x] = int.Parse(linesLength[x].Split(":")[1]);
 
-                        else if (state[x].Contains("rectangle"))
-                        {
-                            if (state[x].Contains("(o)"))
+
+                            if (!linesplit[x].Contains("cell"))
                             {
-                                RectSeed(ref lifeGen, coordinateX[x], coordinateY[x], width[x], height[x], 1);
+                                height[x] = int.Parse(linesplit[x].Split(",")[2]);
+                                width[x] = int.Parse(linesplit[x].Split(",")[3]);
+                            }
+                        }
+
+                        for (int x = 0; x < coordinateX.Length; x++)
+                        {
+                            if (state[x].Contains("cell"))
+                            {
+                                if (state[x].Contains("(o)"))
+                                {
+                                    CellSeed(ref lifeGen, coordinateX[x], coordinateY[x], 1);
+                                }
+                                else
+                                {
+                                    CellSeed(ref lifeGen, coordinateX[x], coordinateY[x], 0);
+                                }
+                            }
+
+                            else if (state[x].Contains("rectangle"))
+                            {
+                                if (state[x].Contains("(o)"))
+                                {
+                                    RectSeed(ref lifeGen, coordinateX[x], coordinateY[x], width[x], height[x], 1);
+                                }
+                                else
+                                {
+                                    RectSeed(ref lifeGen, coordinateX[x], coordinateY[x], width[x], height[x], 0);
+                                }
                             }
                             else
                             {
-                                RectSeed(ref lifeGen, coordinateX[x], coordinateY[x], width[x], height[x], 0);
+                                if (state[x].Contains("(o)"))
+                                {
+                                    EllipseSeed(ref lifeGen, coordinateX[x], coordinateY[x], width[x], height[x], 1);
+                                }
+                                else
+                                {
+                                    EllipseSeed(ref lifeGen, coordinateX[x], coordinateY[x], width[x], height[x], 0);
+                                }
                             }
                         }
+                    }
+
+
+                    else
+                    {
+                        string fileContents = "";
+
+                        List<int> rowsList = new List<int>();
+
+                        List<int> columnsList = new List<int>();
+
+                        List<int> widthList = new List<int>();
+
+                        List<int> heightList = new List<int>();
+
+                        List<string> setting = new List<string>();
+
+                        int listCount = 0;
+
+                        int rowsMax = 0;
+
+                        int columnsMax = 0;
+
+                        bool tooBig = false;
+
+                        // reading till the end of the file
+                        while ((fileContents = seedFile.ReadLine()) != null)
+                        {
+                            // reading row values
+                            rowsList.Add(ToInt32(fileContents.Split(' ')[0]));
+
+                            // reading column values
+                            columnsList.Add(ToInt32(fileContents.Split(' ')[1]));
+
+                            // rows are lower than seed row size
+                            if (ToInt32(fileContents.Split(' ')[0]) > rows - 1)
+                            {
+                                tooBig = true;
+                            }
+
+                            // columns are lower than seed column size
+                            if (ToInt32(fileContents.Split(' ')[1]) > columns - 1)
+                            {
+                                tooBig = true;
+                            }
+
+                            // recommended max row value
+                            if (ToInt32(fileContents.Split(' ')[0]) > rowsMax)
+                            {
+                                rowsMax = ToInt32(fileContents.Split(' ')[0]);
+                            }
+
+                            // recommened max column value
+                            if (ToInt32(fileContents.Split(' ')[1]) > columnsMax)
+                            {
+                                columnsMax = ToInt32(fileContents.Split(' ')[1]);
+                            }
+
+                            ++listCount;
+                        }
+
+                        // if the dimensions are not enough
+                        if (tooBig == true)
+                        {
+                            if (rowsMax < 3)
+                            {
+                                rowsMax += 3;
+                            }
+
+                            if (columnsMax < 3)
+                            {
+                                columnsMax += 3;
+                            }
+                            Error.WriteLine(" The dimension size is too small." +
+                                            "the recommended minimum size is {0}, {1}"
+                                            , rowsMax + 1, columnsMax + 1);
+
+                            Randomness(ref lifeGen, randomFactor, Alive);
+                        }
+
+                        // if dimensions ar egood enough
                         else
                         {
-                            if (state[x].Contains("(o)"))
+                            for (int listNumber = 0; listNumber < rowsList.Count; ++listNumber)
                             {
-                                EllipseSeed(ref lifeGen, coordinateX[x], coordinateY[x], width[x], height[x], 1);
-                            }
-                            else
-                            {
-                                EllipseSeed(ref lifeGen, coordinateX[x], coordinateY[x], width[x], height[x], 0);
+                                lifeGen[rowsList[listNumber], columnsList[listNumber]] = Alive;
                             }
                         }
                     }
+
+                    fileMode = true;
                 }
-                //*************
 
-                //    string fileContents = "";
-
-                //    List<int> rowsList = new List<int>();
-
-                //    List<int> columnsList = new List<int>();
-
-                //    List<int> widthList = new List<int>();
-
-                //    List<int> heightList = new List<int>();
-
-                //    List<string> setting = new List<string>();
-
-                //    int listCount = 0;
-
-                //    int rowsMax = 0;
-
-                //    int columnsMax = 0;
-
-                //    int row = 0;
-                //    int column = 0;
-                //    int width = 0;
-                //    int height = 0;
-
-                //    bool tooBig = false;
-                //    if (seedFile.ReadLine() == "#version=2.0")
-                //    {
-                //        while ((fileContents = seedFile.ReadLine()) != null)
-                //        {
-
-                //            string ar = fileContents.Trim().Split(":")[0];
-                //            string ar1 = fileContents.Trim().Split(":")[1];
-
-                //            setting.Add(ar);
-
-                //             row = int.Parse(ar1.Split(",")[0]);
-                //            rowsList.Add(row);
-
-                //             column = int.Parse(ar1.Split(",")[1]);
-                //            columnsList.Add(column);
-
-                //            if (!ar.Contains("cell"))
-                //            {
-                //                 width = int.Parse(ar1.Split(",")[2]);
-                //                widthList.Add(width);
-
-                //                 height = int.Parse(ar1.Split(",")[3]);
-                //                heightList.Add(height);
-                //            }
-                //            //WriteLine(row +"......"+ column + "......" + width +"...." + height);
-                //        }
-
-                //        for (int x = 0; x < setting.Count; x++)
-                //        {
-
-                //            if (setting[x].Contains("cell"))
-                //            {
-                //                if (setting[x].Contains("(o)"))
-                //                {
-                //                    cellseed(ref lifeGen, rowsList[x], columnsList[x], 1);
-                //                }
-                //                else
-                //                {
-                //                    cellseed(ref lifeGen, rowsList[x], columnsList[x], 0);
-                //                }
-                //            }
-
-                //            else if (setting[x].Contains("rectangle"))
-                //            {
-                //                if (setting[x].Contains("(o)"))
-                //                {
-                //                    rectseed(ref lifeGen, rowsList[x], columnsList[x], widthList[x], heightList[x], 1);
-                //                }
-                //                else
-                //                {
-                //                    rectseed(ref lifeGen, rowsList[x], columnsList[x], widthList[x], heightList[x], 0);
-                //                }
-                //            }
-
-                //            else if (setting[x].Contains("ellipse"))
-                //            {
-                //                //WriteLine(setting[x] +"......"+rowsList[x] + "......" + columnsList[x] + "......" + widthList[x] + "...." + heightList[x]);
-                //                if (setting[x].Contains("(o)"))
-                //                {
-                //                    ellipseseed(ref lifeGen, rowsList[x], columnsList[x], widthList[x], heightList[x], 1);
-                //                }
-                //                else
-                //                {
-                //                    ellipseseed(ref lifeGen, rowsList[x], columnsList[x], widthList[x], heightList[x], 0);
-                //                }
-                //            }
-                //        }
-                //    }
-                //    else
-                //    {
-                //        // reading till the end of the file
-                //        while ((fileContents = seedFile.ReadLine()) != null)
-                //        {
-                //            // reading row values
-                //            rowsList.Add(ToInt32(fileContents.Split(' ')[0]));
-
-                //            // reading column values
-                //            columnsList.Add(ToInt32(fileContents.Split(' ')[1]));
-
-                //            // rows are lower than seed row size
-                //            if (ToInt32(fileContents.Split(' ')[0]) > rows - 1)
-                //            {
-                //                tooBig = true;
-                //            }
-
-                //            // columns are lower than seed column size
-                //            if (ToInt32(fileContents.Split(' ')[1]) > columns - 1)
-                //            {
-                //                tooBig = true;
-                //            }
-
-                //            // recommended max row value
-                //            if (ToInt32(fileContents.Split(' ')[0]) > rowsMax)
-                //            {
-                //                rowsMax = ToInt32(fileContents.Split(' ')[0]);
-                //            }
-
-                //            // recommened max column value
-                //            if (ToInt32(fileContents.Split(' ')[1]) > columnsMax)
-                //            {
-                //                columnsMax = ToInt32(fileContents.Split(' ')[1]);
-                //            }
-
-                //            ++listCount;
-                //        }
-
-                //        // if the dimensions are not enough
-                //        if (tooBig == true)
-                //        {
-                //            if (rowsMax < 3)
-                //            {
-                //                rowsMax += 3;
-                //            }
-
-                //            if (columnsMax < 3)
-                //            {
-                //                columnsMax += 3;
-                //            }
-                //            Error.WriteLine(" The dimension size is too small." +
-                //                            "the recommended minimum size is {0}, {1}"
-                //                            , rowsMax + 1, columnsMax + 1);
-
-                //            Randomness(ref lifeGen, randomFactor, Alive);
-                //        }
-
-                //        // if dimensions ar egood enough
-                //        else
-                //        {
-                //            for (int listNumber = 0; listNumber < rowsList.Count; ++listNumber)
-                //            {
-                //                lifeGen[rowsList[listNumber], columnsList[listNumber]] = Alive;
-                //            }
-                //        }
-                //    }
-                //}
-                //// else display error and execute randomly generated cells
-                catch
+                catch(Exception e)
                 {
+                    success = false;
                     Error.WriteLine("The provided file path is invalid");
 
+                    fileMode = false;
                     Randomness(ref lifeGen, randomFactor, Alive);
                 }
             }
@@ -1726,6 +1712,22 @@ namespace Life
                     {
                         grid.UpdateCell(rowNumber, columnNumber, CellState.Full);
                     }
+
+                    else if (tempGen[rowNumber, columnNumber] == (int)CellConstants.Dark)
+                    {
+                        grid.UpdateCell(rowNumber, columnNumber, CellState.Dark);
+                    }
+
+                    else if (tempGen[rowNumber, columnNumber] == (int)CellConstants.Medium)
+                    {
+                        grid.UpdateCell(rowNumber, columnNumber, CellState.Medium);
+                    }
+
+                    else if (tempGen[rowNumber, columnNumber] == (int)CellConstants.Light)
+                    {
+                        grid.UpdateCell(rowNumber, columnNumber, CellState.Light);
+                    }
+
                     // update dead cells as blank
                     else
                     {
@@ -1822,6 +1824,28 @@ namespace Life
         }
 
         /// <summary>
+        /// survival and birth lists for the ranges
+        /// </summary>
+        /// <param name="survivalFirstValue"></param>
+        /// <param name="survivalLastValue"></param>
+        /// <param name="birthFirstValue"></param>
+        /// <param name="birthLastValue"></param>
+        static void SurvivalAndBirthRange(ref int survivalFirstValue, ref int survivalLastValue,
+                                         ref int birthFirstValue, ref int birthLastValue,
+                                         ref List<int> survivalConstraints, ref List<int> birthConstraints)
+        {
+            for (int i = survivalFirstValue; i <= survivalLastValue; ++i)
+            {
+                survivalConstraints.Add(i);
+            }
+
+            for (int i = birthFirstValue; i <= birthLastValue; ++i)
+            {
+                birthConstraints.Add(i);
+            }
+        }
+
+        /// <summary>
         /// method to call the ending of the game
         /// </summary>
         /// <param name="grid"></param>
@@ -1844,6 +1868,22 @@ namespace Life
 
             // revert grid window size and buffer to normal
             grid.RevertWindow();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lifeGen"></param>
+        /// <param name="fileName"></param>
+        static void WriteToFile(ref int[,] lifeGen, string fileName)
+        {
+            for (int rowcheck = 0; rowcheck < lifeGen.GetLength(0); ++rowcheck)
+            {
+                for (int columncheck = 0; columncheck < lifeGen.GetLength(1); ++columncheck)
+                {
+
+                }
+            }
         }
 
         // enumeration of repeating constants used in Main
@@ -1870,55 +1910,33 @@ namespace Life
             int columns = 16;
             bool periodicMode = false;
             double randomFactor = 0.5;
-            string inputFile = "/Users/chilla/Desktop/game-of-life/CAB201_2020S2_ProjectPartB_n10454012/Seeds/glider.seed";
+            string inputFile = "/Users/chilla/Desktop/game-of-life/CAB201_2020S2_ProjectPartB_n10454012/Seeds/figure-eight_14x14.seed";
             int generations = 50;
             double maxUpdateRate = 5;
             bool stepMode = false;
-            string neighborhoodType = "vonneumann";
+            string neighborhoodType = "moore";
             int neighborhoodOrder = 1;
             bool centreCount = false;
-            bool ghostMode = false;
-            int generationalMemory = 16;
+            bool ghostMode = true;
+            int generationalMemory = 10;
             string outputFile = "";
             int survivalFirstValue = 2;
             int survivalLastValue = 3;
             int birthFirstValue = 3;
             int birthLastValue = 3;
+            bool isSteady = false;
+            bool fileMode = false;
+
+            Queue<string> memoryQueue = new Queue<string>();
 
             List<int> survivalConstraints = new List<int>();
 
-            // survivalConstraints.Add(2);
-            // survivalConstraints.Add(3);
-
-            //if ((survivalFirstValue > survivalLastValue) || (survivalFirstValue < 0))
-            //{
-            //    throw new Exception("error in first value");
-            //}
-
-            //for (int i = survivalFirstValue; i <= survivalLastValue; ++i)
-            //{
-            //    survivalConstraints.Add(i);
-            //}
-
-            //// survivalConstraints.ForEach(Console.WriteLine);
-
             List<int> birthConstraints = new List<int>();
-            //// birthConstraints.Add(3);
 
-            //// int birthFirstValue = 34;
-            //// int birthLastValue = 45;
-
-            //if ((birthFirstValue > birthLastValue) || (birthFirstValue < 0))
-            //{
-            //    throw new Exception("error in first value");
-            //}
-
-            //for (int i = birthFirstValue; i <= birthLastValue; ++i)
-            //{
-            //    birthConstraints.Add(i);
-            //}
-
-            // birthConstraints.ForEach(Console.WriteLine);
+            // getting the survival and birth ranges
+            SurvivalAndBirthRange(ref survivalFirstValue, ref survivalLastValue,
+                                  ref birthFirstValue, ref birthLastValue, ref survivalConstraints,
+                                  ref birthConstraints);
 
             // success variable
             bool success = true;
@@ -1949,7 +1967,7 @@ namespace Life
 
             // seed file reading and checking
             FileContents(ref lifeGen, ref inputFile, ref rows,
-                         ref columns, ref randomFactor, (int)CellConstants.Alive);
+                         ref columns, ref randomFactor, (int)CellConstants.Alive, ref success, ref fileMode);
 
             // displaying runtime settings
             DisplayRuntimeSettings(ref inputFile, ref generations, ref maxUpdateRate, ref periodicMode,
@@ -2012,13 +2030,85 @@ namespace Life
                     }
                 }
 
-                // CellStates(ref int state, ref int spot, ref int cell, ref List<int> survival, ref List<int> birth, ref ghostMode)
+                // CellStates(state, ref spot, cell, survival, birth, ref ghostMode);
 
-                // step mode funtionality
-                StepModeSpacebar(ref stepMode);
+                if (ghostMode)
+                {
+
+                    String[] QueueStrings = memoryQueue.ToArray();
+
+                    int history = 1;
+
+                    // getting old generations
+                    for (int i = QueueStrings.Length - 1; i >= 0 && history < 4; --i)
+                    {
+                        int[,] previousLifeGen = GetArrayFromString(QueueStrings[i], rows, columns);
+
+                        for (int rowcheck = 0; rowcheck < tempGen.GetLength(0); ++rowcheck)
+                        {
+                            for (int columncheck = 0; columncheck < tempGen.GetLength(1); ++columncheck)
+                            {
+
+                                if ((tempGen[rowcheck, columncheck] == (int)CellConstants.Dead) && (previousLifeGen[rowcheck, columncheck] == (int)CellConstants.Alive))
+                                {
+
+                                    switch (history)
+                                    {
+                                        case 1:
+
+                                            tempGen[rowcheck, columncheck] = (int)CellConstants.Dark;
+                                            break;
+
+                                        case 2:
+
+                                            tempGen[rowcheck, columncheck] = (int)CellConstants.Medium;
+                                            break;
+
+                                        case 3:
+
+                                            tempGen[rowcheck, columncheck] = (int)CellConstants.Light;
+                                            break;
+
+                                        default:
+
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+
+                        ++history;
+                    }
+                }
+
+                 // step mode funtionality
+                 StepModeSpacebar(ref stepMode);
 
                 // update generation grid after rules of life
                 UpdateGenerationGrid(ref lifeGen, ref tempGen, grid, (int)CellConstants.Dead);
+
+                // updating memory
+                isSteady = AddToQueue(lifeGen, ref generationalMemory, memoryQueue);
+
+                if (isSteady)
+                {
+                    grid.IsComplete = true;
+                    grid.Render();
+
+                    if (fileMode == true)
+                    {
+                        WriteLine("steady state detected... periodicity = " + currentGeneration);
+                    }
+
+                    else
+                    {
+                        WriteLine("steady state detected... periodicity = N/A");
+                    }
+
+                    ReadLine();
+
+                    break;
+                }
 
                 // frame rate according update rate
                 FrameRatePerGen(ref maxUpdateRate, watch);
@@ -2032,8 +2122,18 @@ namespace Life
                 grid.Render();
             }
 
-            // clearing amnd resetting grid
-            GameOver(grid);
+            if (!isSteady)
+            {
+                // clearing and resetting grid
+                GameOver(grid);
+            }
+
+            else
+            {
+                grid.RevertWindow();
+            }
+
+            //TODO: CALL TO WRITE FUNCTION
         }
     }
 }
