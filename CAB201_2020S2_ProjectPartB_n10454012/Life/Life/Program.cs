@@ -12,16 +12,6 @@ using static System.ConsoleKey;
 
 namespace Life
 {
-    // encapsulation has been used here as interface maps on to the classes as public methods
-    // make write to file private and reads also private
-
-    // the getneighbors method in abstract Ineighbors interface has been us
-  
-    // the get neighbors method in Ineighbors worked differently in moore nieghborhood, von neumann neighborhood,
-    // depending on the nieghborhood requested in runtime which is runtime polymorphism
-
-    // implement throws from catches for exception handling
-
     /// <summary>
     /// interface to count the neighbors of a cell
     /// </summary>
@@ -565,34 +555,36 @@ namespace Life
                             // checking if survival range values are provided as integrers
                             if (!int.TryParse(args[index + 1], out survivalFirstValue) && !int.TryParse(args[index + 3], out survivalLastValue))
                             {
-                                survivalFirstValue = 2;
+                                survivalFirstValue = 3;
                                 survivalLastValue = 3;
 
                                 success = false;
                                 Error.WriteLine("first value and/or last value of survival must be an integer(s)");
                             }
-                            // if so checkin for the boundry conditions
+                            // if so checking for the boundry conditions
                             else
                             {
                                 // lower bound can't be greater than the upper bound
                                 if (survivalFirstValue > survivalLastValue)
                                 {
-                                    survivalFirstValue = 2;
+                                    survivalFirstValue = 3;
                                     survivalLastValue = 3;
 
                                     success = false;
                                     Error.WriteLine("first value of survival must not be greater than the second value");
                                 }
+
                                 // lower bound must a positive non-zero integer
                                 else if (survivalFirstValue < 0)
                                 {
-                                    survivalFirstValue = 2;
+                                    survivalFirstValue = 3;
                                     survivalLastValue = 3;
 
                                     success = false;
                                     Error.WriteLine("first value of survival must be a positive non-zero value");
                                 }
                             }
+
                             // adding the range values to a list of survival integers
                             for (int i = survivalFirstValue; i <= survivalLastValue; ++i)
                             {
@@ -600,9 +592,9 @@ namespace Life
                             }
                         }
                         // if value is not provided as an interger
-                        catch (Exception e)
+                        catch (InvalidDataException ex)
                         {
-                            survivalFirstValue = 2;
+                            survivalFirstValue = 3;
                             survivalLastValue = 3;
 
                             // adding the range values to a list of survival integers
@@ -612,7 +604,8 @@ namespace Life
                             }
 
                             success = false;
-                            Error.WriteLine("first value of survival must be an integer");
+                            Error.WriteLine(ex.Message);
+                            Error.WriteLine("First value of survival must be an integer");
                         }
                     }
                     // if only a single interger is provided
@@ -623,48 +616,32 @@ namespace Life
                             try
                             {
                                 // checking if survival value is provided as an integer
-                                if (int.TryParse(args[index + 1], out int survivalValue))
-                                {
-                                    // survival value can't be less than zero
-                                    if (!(survivalValue > 0))
-                                    {
-                                        survivalFirstValue = 2;
-                                        survivalLastValue = 3;
+                                int.TryParse(args[index + 1], out int survivalValue);
 
-                                        success = false;
-                                        Error.WriteLine("survival must be a positive non-zero value");
-                                    }
-                                    else
-                                    {
-                                        survivalFirstValue = survivalValue;
-                                        survivalLastValue = survivalValue;
-                                    }
-                                    // adding the range values to a list of survival integers
-                                    for (int j = survivalFirstValue; j <= survivalLastValue; ++j)
-                                    {
-                                        survivalConstraints.Add(i);
-                                    }
-                                }
-                                // if not provided as an integer
-                                else
+                                if (!(survivalValue > 0))
                                 {
-                                    survivalFirstValue = 2;
+                                    survivalFirstValue = 3;
                                     survivalLastValue = 3;
 
-                                    // adding the range values to a list of survival integers
-                                    for (int j = survivalFirstValue; j <= survivalLastValue; ++j)
-                                    {
-                                        survivalConstraints.Add(j);
-                                    }
-
                                     success = false;
-                                    Error.WriteLine("survival must be an integer");
+                                    Error.WriteLine("survival must be a positive non-zero value");
+                                }
+                                else
+                                {
+                                    survivalFirstValue = survivalValue;
+                                    survivalLastValue = survivalValue;
+                                }
+
+                                // adding the range values to a list of survival integers
+                                for (int j = survivalFirstValue; j <= survivalLastValue; ++j)
+                                {
+                                    survivalConstraints.Add(i);
                                 }
                             }
-                            // checking if survival value was provided
-                            catch
+                            // survival value was not provided as an integer
+                            catch (InvalidDataException ex)
                             {
-                                survivalFirstValue = 2;
+                                survivalFirstValue = 3;
                                 survivalLastValue = 3;
 
                                 // adding the range values to a list of survival integers
@@ -674,15 +651,16 @@ namespace Life
                                 }
 
                                 success = false;
-                                Error.WriteLine("survival was not povided");
+                                Error.WriteLine(ex.Message);
+                                Error.WriteLine("survival value must be an integer");
                             }
                         }
                     }
                 }
                 // survival arguments have not been provided
-                catch (IndexOutOfRangeException e)
+                catch (IndexOutOfRangeException ex)
                 {
-                    survivalFirstValue = 2;
+                    survivalFirstValue = 3;
                     survivalLastValue = 3;
 
                     // adding the range values to a list of survival integers
@@ -692,7 +670,8 @@ namespace Life
                     }
 
                     success = false;
-                    Error.WriteLine("Invalid length of survival arguments");
+                    Error.WriteLine(ex.Message);
+                    Error.WriteLine("1 survival parameter is missing");
                 }
             }
 
@@ -748,7 +727,7 @@ namespace Life
                             }
                         }
                         // if value is not provided as an interger
-                        catch (Exception e)
+                        catch (InvalidDataException ex)
                         {
                             birthFirstValue = 3;
                             birthLastValue = 3;
@@ -760,7 +739,8 @@ namespace Life
                             }
 
                             success = false;
-                            Error.WriteLine("first value of birth must be an integer");
+                            Error.WriteLine(ex.Message);
+                            Error.WriteLine("First value of birth must be an integer");
                         }
                     }
                     // if only a single interger is provided
@@ -771,46 +751,30 @@ namespace Life
                             try
                             {
                                 // checking if birth value is provided as an integer
-                                if (int.TryParse(args[index + 1], out int birthValue))
-                                {
-                                    if (!(birthValue > 0))
-                                    {
-                                        birthFirstValue = 3;
-                                        birthLastValue = 3;
+                                int.TryParse(args[index + 1], out int birthValue);
 
-                                        success = false;
-                                        Error.WriteLine("birth must be a positive non-zero value");
-                                    }
-                                    else
-                                    {
-                                        birthFirstValue = birthValue;
-                                        birthLastValue = birthValue;
-                                    }
-
-                                    // adding the range values to a list of birth integers
-                                    for (int j = birthFirstValue; j <= birthLastValue; ++j)
-                                    {
-                                        birthConstraints.Add(i);
-                                    }
-                                }
-                                // if not provided as an integer
-                                else
+                                if (!(birthValue > 0))
                                 {
                                     birthFirstValue = 3;
                                     birthLastValue = 3;
 
-                                    // adding the range values to a list of birth integers
-                                    for (int j = birthFirstValue; j <= birthLastValue; ++j)
-                                    {
-                                        birthConstraints.Add(j);
-                                    }
-
                                     success = false;
-                                    Error.WriteLine("birth must be an integer");
+                                    Error.WriteLine("birth must be a positive non-zero value");
+                                }
+                                else
+                                {
+                                    birthFirstValue = birthValue;
+                                    birthLastValue = birthValue;
+                                }
+
+                                // adding the range values to a list of birth integers
+                                for (int j = birthFirstValue; j <= birthLastValue; ++j)
+                                {
+                                    birthConstraints.Add(i);
                                 }
                             }
-                            // checking if birth value was provided
-                            catch
+                            // birth value was not provided as an integer
+                            catch (InvalidDataException ex)
                             {
                                 birthFirstValue = 3;
                                 birthLastValue = 3;
@@ -822,13 +786,14 @@ namespace Life
                                 }
 
                                 success = false;
-                                Error.WriteLine("birth was not povided");
+                                Error.WriteLine(ex.Message);
+                                Error.WriteLine("Birth value must be an integer");
                             }
                         }
                     }
                 }
                 // birth arguments have not been provided
-                catch (IndexOutOfRangeException e)
+                catch (IndexOutOfRangeException ex)
                 {
                     birthFirstValue = 3;
                     birthLastValue = 3;
@@ -840,7 +805,8 @@ namespace Life
                     }
 
                     success = false;
-                    Error.WriteLine("Invalid length of birth arguments");
+                    Error.WriteLine(ex.Message);
+                    Error.WriteLine("1 birth parameter is missing");
                 }
             }
         }
@@ -860,8 +826,10 @@ namespace Life
                                  ref int neighborhoodOrder, ref bool centreCount, ref bool success,
                                  ref int rows, ref int columns)
         {
+            int missing = 0;
+
             // --neighbopr args
-            if (args[index] == "--neighbor")
+            if (args[index] == "--neighbour")
             {
                 // checking neighborhood type
                 try
@@ -886,12 +854,13 @@ namespace Life
                     }
                 }
                 // neighborhood arguments have not been provided
-                catch (Exception fail)
+                catch (IndexOutOfRangeException ex)
                 {
                     neighborhoodType = "moore";
 
                     success = false;
-                    throw new ArgumentException(fail.Message);
+                    Error.WriteLine(ex.Message);
+                    ++missing;
                 }
 
                 // checking neighborhood order
@@ -933,12 +902,13 @@ namespace Life
                     }
                 }
                 // neighborhood order argument not provided
-                catch (Exception fail)
+                catch (IndexOutOfRangeException ex)
                 {
                     neighborhoodOrder = 1;
 
                     success = false;
-                    throw new ArgumentException(fail.Message);
+                    Error.WriteLine(ex.Message);
+                    ++missing;
                 }
 
                 // checking centre count
@@ -954,12 +924,40 @@ namespace Life
                     }
                 }
                 // centre count argument was not provided
-                catch
+                catch(IndexOutOfRangeException ex)
                 {
                     centreCount = false;
 
                     success = false;
-                    Error.WriteLine("centre count must be provided");
+
+                    Error.WriteLine(ex.Message);
+                    ++missing;
+                }
+
+                switch (missing)
+                {
+                    case 0 :
+
+                        break;
+
+                    case 1 :
+
+                        Error.WriteLine("1 neighbour parameter is missing");
+                        break;
+
+                    case 2 :
+
+                        Error.WriteLine("2 neighbour parameters are missing");
+                        break;
+
+                    case 3 :
+
+                        Error.WriteLine("3 neighbour parameters are missing");
+                        break;
+
+                    default:
+
+                        break;
                 }
             }
         }
@@ -971,7 +969,7 @@ namespace Life
         /// </summary>
         /// <param name="lifeGen"></param>
         /// <param name="randomFactor"></param>
-        /// <param name="(int)CellConstants.Alive"></param>
+        /// <param name="Alive"></param>
         public static void Randomness(ref int[,] lifeGen, double randomFactor, int Alive)
         {
             // randomly generating alive and dead cells
@@ -1038,7 +1036,7 @@ namespace Life
                                 rows = 16;
 
                                 success = false;
-                                Error.WriteLine("rows must be a positive integer between 4 and 48(inclusive).");
+                                Error.WriteLine("Rows must be a positive integer between 4 and 48(inclusive).");
                             }
                         }
                         // displaying error and assigning default rows
@@ -1047,9 +1045,8 @@ namespace Life
                             rows = 16;
 
                             success = false;
-                            Error.WriteLine("provided row value must be an integer");
+                            Error.WriteLine("Provided row value must be an integer");
                         }
-
 
                         // if parameter is an integer, storing columns value
                         if (int.TryParse(args[index + 2], out columns))
@@ -1061,7 +1058,7 @@ namespace Life
                                 columns = 16;
 
                                 success = false;
-                                Error.WriteLine("columns must be a positive integer between 4 and 48(inclusive).");
+                                Error.WriteLine("Columns must be a positive integer between 4 and 48(inclusive).");
                             }
                         }
                         // else displaying error and assigning default rows
@@ -1070,17 +1067,18 @@ namespace Life
                             columns = 16;
 
                             success = false;
-                            Error.WriteLine("provided column value must be an integer");
+                            Error.WriteLine("Provided column value must be an integer");
                         }
                     }
                 }
                 // no parametrs provided
-                catch
+                catch(IndexOutOfRangeException ex)
                 {
                     rows = 16;
                     columns = 16;
 
                     success = false;
+                    Error.WriteLine(ex.Message);
                     Error.WriteLine("2 dimensions parameters are missing");
                 }
             }
@@ -1140,11 +1138,12 @@ namespace Life
                     }
                 }
                 // no parameter provided
-                catch
+                catch(IndexOutOfRangeException ex)
                 {
                     randomFactor = 0.5;
 
                     success = false;
+                    Error.WriteLine(ex.Message);
                     Error.WriteLine("1 random factor parameter is missing");
                 }
             }
@@ -1181,11 +1180,12 @@ namespace Life
                     }
                 }
                 // no paramter provided
-                catch
+                catch(IndexOutOfRangeException ex)
                 {
                     inputFile = "";
 
                     success = false;
+                    Error.WriteLine(ex.Message);
                     Error.WriteLine("1 input file parameter is missing");
                 }
             }
@@ -1230,11 +1230,12 @@ namespace Life
                     }
                 }
                 // else display error and assign defult generations
-                catch
+                catch(IndexOutOfRangeException ex)
                 {
                     generations = 50;
 
                     success = false;
+                    Error.WriteLine(ex.Message);
                     Error.WriteLine("1 generations parameter is missing");
                 }
             }
@@ -1279,11 +1280,12 @@ namespace Life
                     }
                 }
                 // else display error and assign defualt maximum update rate
-                catch
+                catch(IndexOutOfRangeException ex)
                 {
                     maxUpdateRate = 5;
 
                     success = false;
+                    Error.WriteLine(ex.Message);
                     Error.WriteLine("1 update rate parameter is missing");
                 }
             }
@@ -1572,9 +1574,10 @@ namespace Life
                 }
 
                 // if the provided file path is invlaid
-                catch(Exception e)
+                catch(IndexOutOfRangeException ex)
                 {
                     success = false;
+                    Error.WriteLine(ex.Message);
                     Error.WriteLine("The provided file path is invalid");
 
                     fileMode = false;
