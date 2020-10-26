@@ -16,7 +16,7 @@ namespace Life
     // make write to file private and reads also private
 
     // the getneighbors method in abstract Ineighbors interface has been us
-
+  
     // the get neighbors method in Ineighbors worked differently in moore nieghborhood, von neumann neighborhood,
     // depending on the nieghborhood requested in runtime which is runtime polymorphism
 
@@ -37,7 +37,7 @@ namespace Life
         /// <param name="neighborhoodOrder"></param>
         /// <param name="centreCount"></param>
         /// <returns></returns>
-        int GetNeighbors(ref int[,] lifeGen, ref int rowCheck, ref int columnCheck,
+        public int GetNeighbors(ref int[,] lifeGen, ref int rowCheck, ref int columnCheck,
                          ref bool periodicMode, ref int neighborhoodOrder, ref bool centreCount);
     }
 
@@ -315,7 +315,7 @@ namespace Life
         /// <param name="survivalLastValue"></param>
         /// <param name="birthFirstValue"></param>
         /// <param name="birthLastValue"></param>
-        static void PerformingChecks(string[] args, ref bool success, ref int rows,
+        public static void PerformingChecks(string[] args, ref bool success, ref int rows,
                                      ref int columns, ref bool periodicMode, ref double randomFactor,
                                      ref string inputFile, ref int generations, ref double maxUpdateRate,
                                      ref bool stepMode, ref string neighborhoodType, ref int neighborhoodOrder,
@@ -374,7 +374,7 @@ namespace Life
         /// <param name="lifeGen"></param>
         /// <param name="limit"></param>
         /// <param name="memoryQueue"></param>
-        static bool AddToQueue(int[,] lifeGen, ref int limit, Queue<string> memoryQueue)
+        public static bool AddToQueue(int[,] lifeGen, ref int limit, Queue<string> memoryQueue)
         {
             // calling from array to string conversion
             string list = GetStringFromArray(lifeGen);
@@ -398,7 +398,7 @@ namespace Life
         /// </summary>
         /// <param name="memoryQueue"></param>
         /// <returns></returns>
-        static int Periodicty(Queue<string> memoryQueue)
+        public static int Periodicty(Queue<string> memoryQueue)
         {
             string last = memoryQueue.ToList()[memoryQueue.Count-1];
 
@@ -436,7 +436,7 @@ namespace Life
         /// <param name="index"></param>
         /// <param name="outputFile"></param>
         /// <param name="success"></param>
-        static void OutputFile(string[] args, int index, ref string outputFile, ref bool success)
+        public static void OutputFile(string[] args, int index, ref string outputFile, ref bool success)
         {
             // --output args
             if (args[index] == "--output")
@@ -476,7 +476,7 @@ namespace Life
         /// <param name="index"></param>
         /// <param name="generationalMemory"></param>
         /// <param name="success"></param>
-        static void GenerationalMemory(string[] args, int index, ref int generationalMemory, ref bool success)
+        public static void GenerationalMemory(string[] args, int index, ref int generationalMemory, ref bool success)
         {
             // --memory args
             if (args[index] == "--generations")
@@ -524,7 +524,7 @@ namespace Life
         /// <param name="args"></param>
         /// <param name="index"></param>
         /// <param name="ghostMode"></param>
-        static void GhostMode(string[] args, int index, ref bool ghostMode)
+        public static void GhostMode(string[] args, int index, ref bool ghostMode)
         {
             // --ghost args
             if (args[index] == "--ghost")
@@ -545,7 +545,7 @@ namespace Life
         /// <param name="survivalLastValue"></param>
         /// <param name="birthFirstValue"></param>
         /// <param name="birthLastValue"></param>
-        static void SurvivalAndBirth(string[] args, int index, ref List<int> survivalConstraints,
+        public static void SurvivalAndBirth(string[] args, int index, ref List<int> survivalConstraints,
                                      ref List<int> birthConstraints, ref bool success,
                                      ref int survivalFirstValue, ref int survivalLastValue,
                                      ref int birthFirstValue, ref int birthLastValue)
@@ -856,7 +856,7 @@ namespace Life
         /// <param name="success"></param>
         /// <param name="rows"></param>
         /// <param name="columns"></param>
-        static void Neighborhood(string[] args, int index, ref string neighborhoodType,
+        public static void Neighborhood(string[] args, int index, ref string neighborhoodType,
                                  ref int neighborhoodOrder, ref bool centreCount, ref bool success,
                                  ref int rows, ref int columns)
         {
@@ -972,7 +972,7 @@ namespace Life
         /// <param name="lifeGen"></param>
         /// <param name="randomFactor"></param>
         /// <param name="(int)CellConstants.Alive"></param>
-        static void Randomness(ref int[,] lifeGen, double randomFactor, int Alive)
+        public static void Randomness(ref int[,] lifeGen, double randomFactor, int Alive)
         {
             // randomly generating alive and dead cells
             // using random factor
@@ -999,7 +999,7 @@ namespace Life
         /// <param name="success"></param>
         /// <param name="rows"></param>
         /// <param name="columns"></param>
-        static void Dimensions(string[] args, int index, ref bool success,
+        public static void Dimensions(string[] args, int index, ref bool success,
                                ref int rows, ref int columns)
         {
             // --dimensions args
@@ -1108,7 +1108,7 @@ namespace Life
         /// <param name="index"></param>
         /// <param name="randomFactor"></param>
         /// <param name="success"></param>
-        static void RandomFactor(string[] args, int index, ref double randomFactor,
+        public static void RandomFactor(string[] args, int index, ref double randomFactor,
                                  ref bool success)
         {
             // --random args
@@ -1157,7 +1157,7 @@ namespace Life
         /// <param name="index"></param>
         /// <param name="inputFile"></param>
         /// <param name="success"></param>
-        static void InputFile(string[] args, int index, ref string inputFile,
+        public  static void InputFile(string[] args, int index, ref string inputFile,
                               ref bool success)
         {
             // --seed args
@@ -1198,7 +1198,7 @@ namespace Life
         /// <param name="index"></param>
         /// <param name="generations"></param>
         /// <param name="success"></param>
-        static void Generations(string[] args, int index, ref int generations,
+        public static void Generations(string[] args, int index, ref int generations,
                                 ref bool success)
         {
             // --generation args
@@ -1247,7 +1247,7 @@ namespace Life
         /// <param name="index"></param>
         /// <param name="maxUpdateRate"></param>
         /// <param name="success"></param>
-        static void MaxUpdateRate(string[] args, int index, ref double maxUpdateRate,
+        public static void MaxUpdateRate(string[] args, int index, ref double maxUpdateRate,
                                   ref bool success)
         {
             // --max-update args
@@ -1295,7 +1295,7 @@ namespace Life
         /// <param name="args"></param>
         /// <param name="index"></param>
         /// <param name="stepMode"></param>
-        static void StepMode(string[] args, int index, ref bool stepMode)
+        public static void StepMode(string[] args, int index, ref bool stepMode)
         {
             // --step args
             if (args[index] == "--step")
@@ -1311,7 +1311,7 @@ namespace Life
         /// <param name="row"></param>
         /// <param name="column"></param>
         /// <param name="state"></param>
-        static void CellSeed(ref int[,] seedArray, int row, int column, int state) 
+        public static void CellSeed(ref int[,] seedArray, int row, int column, int state) 
         {
             // cell logic
             seedArray[row, column] = state;
@@ -1326,7 +1326,7 @@ namespace Life
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <param name="state"></param>
-        static void RectSeed(ref int[,] seedArray, int row, int column, int width,  int height, int state)
+        public static void RectSeed(ref int[,] seedArray, int row, int column, int width,  int height, int state)
         {
             // rectangle logic
             for (int x = row; x <= height; ++x) 
@@ -1347,7 +1347,7 @@ namespace Life
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <param name="state"></param>
-        static void EllipseSeed(ref int[,] seedArray, int row, int column, int width, int height, int state)
+        public static void EllipseSeed(ref int[,] seedArray, int row, int column, int width, int height, int state)
         {
             // determining the centre
             double centreX = (double)(row + height) / 2;
@@ -1383,7 +1383,7 @@ namespace Life
         /// <param name="Alive"></param>
         /// <param name="fileMode"></param>
         /// <param name="success"></param>
-        static void FileContents(ref int[,] lifeGen, ref string inputFile,
+        public static void FileContents(ref int[,] lifeGen, ref string inputFile,
                                  ref int rows, ref int columns, ref double randomFactor,
                                  int Alive, ref bool fileMode, ref bool success)
         {
@@ -1610,7 +1610,7 @@ namespace Life
         /// <param name="neighborhoodOrder"></param>
         /// <param name="ghostMode"></param>
         /// <param name="centreCount"></param>
-        static void DisplayRuntimeSettings(ref string inputFile, ref int generations,
+        public static void DisplayRuntimeSettings(ref string inputFile, ref int generations,
                                            ref double maxUpdateRate, ref bool periodicMode,
                                            ref int rows, ref int columns, ref double randomFactor,
                                            ref bool stepMode, ref bool success, ref string outputFile,
@@ -1618,21 +1618,24 @@ namespace Life
                                            ref int survivalLastValue, ref int birthFirstValue,
                                            ref int birthLastValue, ref string neighborhoodType,
                                            ref int neighborhoodOrder, ref bool ghostMode,
-                                           ref bool centreCount)
+                                           ref bool centreCount, ref bool argsProvided)
         {
             // display the game settings
             // success rate of args
-            if (success == true)
+            if (argsProvided == true)
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                WriteLine("\n Success: all command line arguments correctly processed.");
-                Console.ForegroundColor = ConsoleColor.White;
-            }
-            else
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                WriteLine("Failure: not all command line arguments correctly processed.");
-                Console.ForegroundColor = ConsoleColor.White;
+                if (success == true)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    WriteLine("\n Success: all command line arguments correctly processed.");
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    WriteLine("Failure: not all command line arguments correctly processed.");
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
             }
 
             // header
@@ -1756,7 +1759,7 @@ namespace Life
         /// be pressed depending on step mode
         /// </summary>
         /// <param name="stepMode"></param>
-        static void StepModeSpacebar(ref bool stepMode)
+        public static void StepModeSpacebar(ref bool stepMode)
         {
             // if step mode is on, wait until space bar is pressed before moving to the next generation
             if (stepMode == true)
@@ -1778,7 +1781,7 @@ namespace Life
         /// </summary>
         /// <param name="lifeGen"></param>
         /// <param name="grid"></param>
-        static void UpdateInitialGrid(ref int[,] lifeGen, Grid grid)
+        public static void UpdateInitialGrid(ref int[,] lifeGen, Grid grid)
         {
             for (int rowNumber = 0; rowNumber < lifeGen.GetLength(0); ++rowNumber)
             {
@@ -1806,7 +1809,7 @@ namespace Life
         /// <param name="tempGen"></param>
         /// <param name="grid"></param>
         /// <param name="Dead"></param>
-        static void UpdateGenerationGrid(ref int[,] lifeGen, ref int[,] tempGen,
+        public static void UpdateGenerationGrid(ref int[,] lifeGen, ref int[,] tempGen,
                                          Grid grid, int Dead)
         {
             // iterating through the temporary arrays rows and columns
@@ -1856,7 +1859,7 @@ namespace Life
         /// </summary>
         /// <param name="maxUpdateRate"></param>
         /// <param name="watch"></param>
-        static void FrameRatePerGen(ref double maxUpdateRate, Stopwatch watch)
+        public static void FrameRatePerGen(ref double maxUpdateRate, Stopwatch watch)
         {
             // 1 second = 1000 milli-seconds
             // converting to milliseconds
@@ -1888,7 +1891,7 @@ namespace Life
         /// <param name="neighborsnew"></param>
         /// <param name="neighborhoodOrder"></param>
         /// <param name="centreCount"></param>
-        static void RulesOfLife(ref int[,] lifeGen, ref int[,] tempGen, ref int rowCheck,
+        public static void RulesOfLife(ref int[,] lifeGen, ref int[,] tempGen, ref int rowCheck,
                                 ref int columnCheck, ref bool periodicMode, ref List<int> survivalConstraints,
                                 ref List<int> birthConstraints, INeighbors neighborsnew, ref int neighborhoodOrder,
                                 ref bool centreCount)
@@ -1943,7 +1946,7 @@ namespace Life
         /// <param name="birthLastValue"></param>
         /// <param name="survivalConstraints"></param>
         /// <param name="birthConstraints"></param>
-        static void SurvivalAndBirthRange(ref int survivalFirstValue, ref int survivalLastValue,
+        public static void SurvivalAndBirthRange(ref int survivalFirstValue, ref int survivalLastValue,
                                          ref int birthFirstValue, ref int birthLastValue,
                                          ref List<int> survivalConstraints, ref List<int> birthConstraints)
         {
@@ -1964,7 +1967,7 @@ namespace Life
         /// method to call the ending of the game
         /// </summary>
         /// <param name="grid"></param>
-        static void GameOver(Grid grid)
+        public static void GameOver(Grid grid)
         {
             // set complete marker as true
             grid.IsComplete = true;
@@ -2034,7 +2037,7 @@ namespace Life
         /// <param name="tempGen"></param>
         /// <param name="rows"></param>
         /// <param name="columns"></param>
-        static void GhostModeCells(Queue<string> memoryQueue, int[,] tempGen, int rows,
+        public static void GhostModeCells(Queue<string> memoryQueue, int[,] tempGen, int rows,
                                    int columns)
         {
             String[] QueueStrings = memoryQueue.ToArray();
@@ -2109,7 +2112,7 @@ namespace Life
             string inputFile = "/Users/chilla/Desktop/game-of-life/CAB201_2020S2_ProjectPartB_n10454012/Seeds(1)/Seeds/kaleidoscope1_47x47.seed";
             int generations = 2250;
             double maxUpdateRate = 100;
-            bool stepMode = false;
+            bool stepMode = true;
             string neighborhoodType = "vonneumann";
             int neighborhoodOrder = 4;
             bool centreCount = true;
@@ -2139,24 +2142,28 @@ namespace Life
             // success variable
             bool success = true;
 
+            // args provided check variable
+            bool argsProvided = false;
+
             // performing checks
-            
-                // program should run in default values if no arguments are provided
-                if (args.Length == 0)
-                {
-                    WriteLine("No command line arguments provided. Program will run on default mode");
-                }
-                // perform according to args
-                else
-                {
-                    PerformingChecks(args, ref success, ref rows, ref columns,
-                                     ref periodicMode, ref randomFactor, ref inputFile,
-                                     ref generations, ref maxUpdateRate, ref stepMode,
-                                     ref neighborhoodType, ref neighborhoodOrder, ref centreCount,
-                                     ref survivalConstraints, ref birthConstraints, ref ghostMode,
-                                     ref generationalMemory, ref outputFile, ref survivalFirstValue,
-                                     ref survivalLastValue, ref birthFirstValue, ref birthLastValue);
-                }
+            // program should run in default values if no arguments are provided
+            if (args.Length == 0)
+            {
+                WriteLine("No command line arguments provided. Program will run on default mode");
+            }
+            // perform according to args
+            else
+            {
+                argsProvided = true;
+
+                PerformingChecks(args, ref success, ref rows, ref columns,
+                                 ref periodicMode, ref randomFactor, ref inputFile,
+                                 ref generations, ref maxUpdateRate, ref stepMode,
+                                 ref neighborhoodType, ref neighborhoodOrder, ref centreCount,
+                                 ref survivalConstraints, ref birthConstraints, ref ghostMode,
+                                 ref generationalMemory, ref outputFile, ref survivalFirstValue,
+                                 ref survivalLastValue, ref birthFirstValue, ref birthLastValue);
+            }
             
 
             // the game's main 2 dimensional array
@@ -2172,7 +2179,8 @@ namespace Life
                                    ref rows, ref columns, ref randomFactor, ref stepMode, ref success,
                                    ref outputFile, ref generationalMemory, ref survivalFirstValue,
                                    ref survivalLastValue, ref birthFirstValue, ref birthLastValue,
-                                   ref neighborhoodType, ref neighborhoodOrder, ref ghostMode, ref centreCount);
+                                   ref neighborhoodType, ref neighborhoodOrder, ref ghostMode, ref centreCount,
+                                   ref argsProvided);
 
             // construct the game grid
             Grid grid = new Grid(rows, columns);
