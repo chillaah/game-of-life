@@ -200,11 +200,7 @@ namespace Life
                     {
                         if ((Abs(rowCoordinate) + Abs(columnCoordinate)) <= neighborhoodOrder)
                         {
-                            if (lifeGen[rowNumberCurrent, columnNumberCurrent] == (int)CellConstants.Alive)
-                            {
-                                neighbors += 1;
-                            }
-                            
+                            neighbors += lifeGen[rowNumberCurrent, columnNumberCurrent];
                         }
                     }
                 }
@@ -216,7 +212,7 @@ namespace Life
     }
 
     /// <summary>
-    /// 
+    /// method for counting old neighbors
     /// </summary>
     class OldNeighbors : INeighbors
     {
@@ -286,7 +282,6 @@ namespace Life
         }
     }
 
-
     class Program
     {
         /// <summary>
@@ -323,6 +318,7 @@ namespace Life
                                      ref int generationalMemory, ref string outputFile, ref int survivalFirstValue,
                                      ref int survivalLastValue, ref int birthFirstValue, ref int birthLastValue)
         {
+            // performing argument check until the end of arguemnts
             for (int index = 0; index < args.Length; ++index)
             {
                 //dimensions check
@@ -389,6 +385,23 @@ namespace Life
 
             memoryQueue.Enqueue(list);
             return false;
+        }
+
+
+        static int CheckingSteady(Queue<string> memoryQueue)
+        {
+            string last = memoryQueue.ToList()[memoryQueue.Count-1];
+
+            //WriteLine(memoryQueue.Count);
+
+            for (int x = 0; x < memoryQueue.Count; x++)
+            {
+                if (memoryQueue.ToList()[x] == last)
+                {
+                    return x;
+                }
+            }
+            return 0;
         }
 
         /// <summary>
@@ -496,74 +509,6 @@ namespace Life
         }
 
         /// <summary>
-        /// ghost mode implementation
-        /// </summary>
-        /// <param name="state"></param>
-        /// <param name="spot"></param>
-        /// <param name="cell"></param>
-        /// <param name="survival"></param>
-        /// <param name="birth"></param>
-        /// <param name="ghost"></param>
-        static void CellStates(int state, ref int spot, int cell, List<int> survival,
-                               List<int> birth, ref bool ghostMode)
-        {
-            //checking for the number of neighbors depending on the cell state
-            if (cell != (int)CellConstants.Alive)
-            {
-                if (birth.Contains(state))
-                {
-                    spot = (int)CellConstants.Alive; //cell is alive for next generation
-                }
-
-                else
-                {
-                    if (ghostMode == true)
-                    {
-                        if (cell == (int)CellConstants.Dark)
-                        {
-                            spot = (int)CellConstants.Medium;
-                        }
-
-                        else if (cell == (int)CellConstants.Medium)
-                        {
-                            spot = (int)CellConstants.Light;
-                        }
-
-                        else
-                        {
-                            spot = (int)CellConstants.Dead;
-                        }
-                    }
-
-                    else
-                    {
-                        spot = (int)CellConstants.Dead;
-                    }
-                }
-            }
-            else if (cell == (int)CellConstants.Alive)
-            {
-                if (survival.Contains(state))
-                {
-                    spot = (int)CellConstants.Alive;
-                }
-
-                else
-                {
-                    if (ghostMode == true)
-                    {
-                        spot = (int)CellConstants.Dark;
-                    }
-
-                    else
-                    {
-                        spot = (int)CellConstants.Dead;
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         /// ghost mode check
         /// </summary>
         /// <param name="args"></param>
@@ -607,7 +552,7 @@ namespace Life
                     {
                         try
                         {
-                            // checking i survival range values are provided are integrers
+                            // checking if survival range values are provided as integrers
                             if (!int.TryParse(args[index + 1], out survivalFirstValue) && !int.TryParse(args[index + 3], out survivalLastValue))
                             {
                                 survivalFirstValue = 2;
@@ -628,7 +573,6 @@ namespace Life
                                     success = false;
                                     Error.WriteLine("first value of survival must not be greater than the second value");
                                 }
-
                                 // lower bound must a positive non-zero integer
                                 else if (survivalFirstValue < 0)
                                 {
@@ -639,36 +583,40 @@ namespace Life
                                     Error.WriteLine("first value of survival must be a positive non-zero value");
                                 }
                             }
-
+                            // adding the range values to a list of survival integers
                             for (int i = survivalFirstValue; i <= survivalLastValue; ++i)
                             {
                                 survivalConstraints.Add(i);
                             }
                         }
-
+                        // if value is not provided as an interger
                         catch (Exception e)
                         {
                             survivalFirstValue = 2;
                             survivalLastValue = 3;
 
+                            // adding the range values to a list of survival integers
                             for (int i = survivalFirstValue; i <= survivalLastValue; ++i)
                             {
                                 survivalConstraints.Add(i);
                             }
 
                             success = false;
-                            Error.WriteLine("first value of survival must be a positive non-zero value");
+                            Error.WriteLine("first value of survival must be an integer");
                         }
                     }
+                    // if only a single interger is provided
                     else
                     {
                         for (int i = index + 1; i < args.Length; ++i)
                         {
                             try
                             {
+                                // checking if survival value is provided as an integer
                                 if (int.TryParse(args[index + 1], out int survivalValue))
                                 {
-                                    if (!(survivalValue > 1))
+                                    // survival value can't be less than zero
+                                    if (!(survivalValue > 0))
                                     {
                                         survivalFirstValue = 2;
                                         survivalLastValue = 3;
@@ -681,17 +629,19 @@ namespace Life
                                         survivalFirstValue = survivalValue;
                                         survivalLastValue = survivalValue;
                                     }
-
+                                    // adding the range values to a list of survival integers
                                     for (int j = survivalFirstValue; j <= survivalLastValue; ++j)
                                     {
                                         survivalConstraints.Add(i);
                                     }
                                 }
+                                // if not provided as an integer
                                 else
                                 {
                                     survivalFirstValue = 2;
                                     survivalLastValue = 3;
 
+                                    // adding the range values to a list of survival integers
                                     for (int j = survivalFirstValue; j <= survivalLastValue; ++j)
                                     {
                                         survivalConstraints.Add(j);
@@ -701,12 +651,13 @@ namespace Life
                                     Error.WriteLine("survival must be an integer");
                                 }
                             }
-
+                            // checking if survival value was provided
                             catch
                             {
                                 survivalFirstValue = 2;
                                 survivalLastValue = 3;
 
+                                // adding the range values to a list of survival integers
                                 for (int j = survivalFirstValue; j <= survivalLastValue; ++j)
                                 {
                                     survivalConstraints.Add(j);
@@ -718,128 +669,168 @@ namespace Life
                         }
                     }
                 }
-
+                // survival arguments have not been provided
                 catch (IndexOutOfRangeException e)
                 {
-                    Error.WriteLine("Invalid Length of Arguments");
+                    survivalFirstValue = 2;
+                    survivalLastValue = 3;
+
+                    // adding the range values to a list of survival integers
+                    for (int j = survivalFirstValue; j <= survivalLastValue; ++j)
+                    {
+                        survivalConstraints.Add(j);
+                    }
+
+                    success = false;
+                    Error.WriteLine("Invalid length of survival arguments");
                 }
             }
 
+            // --birth args
             if (args[index] == "--birth")
             {
                 birthConstraints.Clear();
 
-                if (args[index + 2] == "...")
+                try
                 {
-                    try
+                    // checking if the range operator is present
+                    if (args[index + 2] == "...")
                     {
-                        if (!int.TryParse(args[index + 1], out birthFirstValue) && !int.TryParse(args[index + 3], out birthLastValue))
+                        try
+                        {
+                            // checking if birth range values are provided as integrers
+                            if (!int.TryParse(args[index + 1], out birthFirstValue) && !int.TryParse(args[index + 3], out birthLastValue))
+                            {
+                                birthFirstValue = 3;
+                                birthLastValue = 3;
+
+                                success = false;
+                                Error.WriteLine("first value and/or last value of birth must be an integer(s)");
+                            }
+                            // if so checking for the boundry conditions
+                            else
+                            {
+                                // lower bound can't be greater than the upper bound
+                                if (birthFirstValue > birthLastValue)
+                                {
+                                    birthFirstValue = 3;
+                                    birthLastValue = 3;
+
+                                    success = false;
+                                    Error.WriteLine("first value of birth must not be greater than the second value");
+                                }
+
+                                // lower bound must a positive non-zero integer
+                                else if (birthFirstValue < 0)
+                                {
+                                    birthFirstValue = 3;
+                                    birthLastValue = 3;
+
+                                    success = false;
+                                    Error.WriteLine("first value of birth must be a positive non-zero value");
+                                }
+                            }
+
+                            // adding the range values to a list of birth integers
+                            for (int i = birthFirstValue; i <= birthLastValue; ++i)
+                            {
+                                birthConstraints.Add(i);
+                            }
+                        }
+                        // if value is not provided as an interger
+                        catch (Exception e)
                         {
                             birthFirstValue = 3;
                             birthLastValue = 3;
 
+                            // adding the range values to a list of birth integers
+                            for (int i = birthFirstValue; i <= birthLastValue; ++i)
+                            {
+                                birthConstraints.Add(i);
+                            }
+
                             success = false;
-                            Error.WriteLine("first value and/or last value of birth must be an integer(s)");
+                            Error.WriteLine("first value of birth must be an integer");
                         }
-
-                        else
+                    }
+                    // if only a single interger is provided
+                    else
+                    {
+                        for (int i = index + 1; i < args.Length; ++i)
                         {
-                            if (birthFirstValue < birthLastValue)
+                            try
+                            {
+                                // checking if birth value is provided as an integer
+                                if (int.TryParse(args[index + 1], out int birthValue))
+                                {
+                                    if (!(birthValue > 0))
+                                    {
+                                        birthFirstValue = 3;
+                                        birthLastValue = 3;
+
+                                        success = false;
+                                        Error.WriteLine("birth must be a positive non-zero value");
+                                    }
+                                    else
+                                    {
+                                        birthFirstValue = birthValue;
+                                        birthLastValue = birthValue;
+                                    }
+
+                                    // adding the range values to a list of birth integers
+                                    for (int j = birthFirstValue; j <= birthLastValue; ++j)
+                                    {
+                                        birthConstraints.Add(i);
+                                    }
+                                }
+                                // if not provided as an integer
+                                else
+                                {
+                                    birthFirstValue = 3;
+                                    birthLastValue = 3;
+
+                                    // adding the range values to a list of birth integers
+                                    for (int j = birthFirstValue; j <= birthLastValue; ++j)
+                                    {
+                                        birthConstraints.Add(j);
+                                    }
+
+                                    success = false;
+                                    Error.WriteLine("birth must be an integer");
+                                }
+                            }
+                            // checking if birth value was provided
+                            catch
                             {
                                 birthFirstValue = 3;
                                 birthLastValue = 3;
 
-                                success = false;
-                                Error.WriteLine("first value of birth must not be greater than the second value");
-                            }
-
-                            else if (birthFirstValue < 0)
-                            {
-                                birthFirstValue = 2;
-                                birthLastValue = 3;
-
-                                success = false;
-                                Error.WriteLine("first value of birth must be a positive non-zero value");
-                            }
-                        }
-
-                        for (int j = birthFirstValue; j <= birthLastValue; ++j)
-                        {
-                            birthConstraints.Add(j);
-                        }
-                    }
-
-                    catch
-                    {
-                        birthFirstValue = 3;
-                        birthLastValue = 3;
-
-                        for (int j = birthFirstValue; j <= birthLastValue; ++j)
-                        {
-                            birthConstraints.Add(j);
-                        }
-
-                        success = false;
-                        Error.WriteLine("first value of birth must be a positive non-zero value");
-                    }
-                }
-            }
-
-            else
-            {
-                for (int i = index + 1; i < args.Length; ++i)
-                {
-                    try
-                    {
-                        if (int.TryParse(args[index + 1], out int birthValue))
-                        {
-                            if (!(birthValue > 1))
-                            {
-                                birthFirstValue = 3;
-                                birthLastValue = 3;
-
-                                success = false;
-                                Error.WriteLine("birth must be a positive non-zero value");
-                            }
-                            else
-                            {
-                                birthFirstValue = birthValue;
-                                birthLastValue = birthValue;
-
+                                // adding the range values to a list of birth integers
                                 for (int j = birthFirstValue; j <= birthLastValue; ++j)
                                 {
                                     birthConstraints.Add(j);
                                 }
-                            }
-                        }
-                        else
-                        {
-                            birthFirstValue = 3;
-                            birthLastValue = 3;
 
-                            for (int j = birthFirstValue; j <= birthLastValue; ++j)
-                            {
-                                birthConstraints.Add(j);
+                                success = false;
+                                Error.WriteLine("birth was not povided");
                             }
-
-                            success = false;
-                            Error.WriteLine("birth must be an integer");
                         }
                     }
+                }
+                // birth arguments have not been provided
+                catch (IndexOutOfRangeException e)
+                {
+                    birthFirstValue = 3;
+                    birthLastValue = 3;
 
-                    catch
+                    // adding the range values to a list of birth integers
+                    for (int j = birthFirstValue; j <= birthLastValue; ++j)
                     {
-                        survivalFirstValue = 2;
-                        survivalLastValue = 3;
-
-                        for (int j = birthFirstValue; j <= birthLastValue; ++j)
-                        {
-                            birthConstraints.Add(j);
-                        }
-
-                        success = false;
-                        Error.WriteLine("birth was not povided");
+                        birthConstraints.Add(j);
                     }
+
+                    success = false;
+                    Error.WriteLine("Invalid length of birth arguments");
                 }
             }
         }
@@ -859,20 +850,23 @@ namespace Life
                                  ref int neighborhoodOrder, ref bool centreCount, ref bool success,
                                  ref int rows, ref int columns)
         {
+            // --neighbopr args
             if (args[index] == "--neighbor")
             {
+                // checking neighborhood type
                 try
                 {
+                    // if moore neighborhood was passed
                     if (args[index + 1].ToLower().Equals("moore"))
                     {
 
                     }
-
-                    else if (args[index + 1].ToLower().Equals("vonNeumann"))
+                    // if von neumann neighborhood was passed
+                    else if (args[index + 1].ToLower().Equals("vonneumann"))
                     {
                         neighborhoodType = args[index + 1];
                     }
-
+                    // invalid neighborhood passed
                     else
                     {
                         neighborhoodType = "moore";
@@ -881,7 +875,7 @@ namespace Life
                         Error.WriteLine("neighboorhood type must be either moore or vonneumann");
                     }
                 }
-
+                // neighborhood arguments have not been provided
                 catch (Exception fail)
                 {
                     neighborhoodType = "moore";
@@ -890,12 +884,16 @@ namespace Life
                     throw new ArgumentException(fail.Message);
                 }
 
+                // checking neighborhood order
                 try
                 {
+                    // if neighborhood order was provided as an integer
                     if (int.TryParse(args[index + 2], out neighborhoodOrder))
                     {
+                        // if neighborhood order was inside the specified range
                         if (1 <= neighborhoodOrder && neighborhoodOrder <= 10)
                         {
+                            // neighborhood order value requirement
                             int minOrder = Min(rows, columns) / 2;
 
                             if (!(neighborhoodOrder < minOrder))
@@ -906,6 +904,7 @@ namespace Life
                                 Error.WriteLine("nieghborhood order must be less than {0}", minOrder);
                             }
                         }
+                        // if provided outside the range
                         else
                         {
                             neighborhoodOrder = 1;
@@ -914,6 +913,7 @@ namespace Life
                             Error.WriteLine("nieghborhood order must be a positive integer between 1 and 10(inclusive).");
                         }
                     }
+                    // if not provided as an integer
                     else
                     {
                         neighborhoodOrder = 1;
@@ -922,7 +922,7 @@ namespace Life
                         Error.WriteLine("nieghborhood order must be provided");
                     }
                 }
-
+                // neighborhood order argument not provided
                 catch (Exception fail)
                 {
                     neighborhoodOrder = 1;
@@ -931,8 +931,10 @@ namespace Life
                     throw new ArgumentException(fail.Message);
                 }
 
+                // checking centre count
                 try
                 {
+                    // if centre count was provided
                     if (!bool.TryParse(args[index + 3].ToLower(), out centreCount))
                     {
                         centreCount = false;
@@ -941,7 +943,7 @@ namespace Life
                         Error.WriteLine("centre count must be of type boolean (true or false)");
                     }
                 }
-
+                // centre count argument was not provided
                 catch
                 {
                     centreCount = false;
@@ -1293,22 +1295,6 @@ namespace Life
         }
 
         /// <summary>
-        /// convert first letter of string to uppercase
-        /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
-        static string UppercaseFirst(string s)
-        {
-            if (string.IsNullOrEmpty(s))
-            {
-                return string.Empty;
-            }
-            char[] a = s.ToCharArray();
-            a[0] = char.ToUpper(a[0]);
-            return new string(a);
-        }
-
-        /// <summary>
         /// reading cell seeds
         /// </summary>
         /// <param name="array"></param>
@@ -1317,6 +1303,7 @@ namespace Life
         /// <param name="state"></param>
         static void CellSeed(ref int[,] seedArray, int row, int column, int state) 
         {
+            // cell logic
             seedArray[row, column] = state;
         }
 
@@ -1331,6 +1318,7 @@ namespace Life
         /// <param name="state"></param>
         static void RectSeed(ref int[,] seedArray, int row, int column, int width,  int height, int state)
         {
+            // rectangle logic
             for (int x = row; x <= height; ++x) 
             {
                 for (int y = column; y <= width; ++y)
@@ -1355,9 +1343,9 @@ namespace Life
             double centreX = (double)(row + height) / 2;
             double centreY = (double)(width + column) / 2;
 
-            // checking with the ellipse rule
+            // ellogic
             for (int i = 0; i < seedArray.GetLength(0); ++i)
-            {
+            { 
                 for (int j = 0; j < seedArray.GetLength(1); ++j)
                 {
                     double xPart = 4 * Math.Pow(i - centreX, 2) / Math.Pow(height - row + 1, 2);
@@ -1366,14 +1354,12 @@ namespace Life
 
                     double ellipseResult = xPart + yPart;
 
-
                     if (ellipseResult <= 1)
                     {
                         seedArray[i, j] = state;
                     }
                 }
             }
-
         }
 
         /// <summary>
@@ -1395,6 +1381,7 @@ namespace Life
                 // checking if the file can successfully be read
                 try
                 {
+                    // new version of seed files
                     StreamReader seedFile = new StreamReader(inputFile);
 
                     if (seedFile.ReadLine() == "#version=2.0")
@@ -1409,25 +1396,29 @@ namespace Life
                         // string array with split line length
                         string[] linesLength = new string[linesplit.Length];
 
-
+                        // seed file row coordinates
                         int[] coordinateX = new int[linesplit.Length];
+
+                        // seed file column coordinates
                         int[] coordinateY = new int[linesplit.Length];
+
+                        // alive/dead with structre of the seed
                         string[] state = new string[linesplit.Length];
                         int[] height = new int[linesplit.Length];
                         int[] width = new int[linesplit.Length];
 
-                        //Assigning values from seed to arrays
+                        // assigning values from seed to arrays
                         for (int x = 0; x < linesplit.Length; x++)
                         {
-
-                            //split each line to their x and y
+                            //splitting each line to y coordinates
                             linesLength[x] = linesplit[x].Split(",")[0];
                             coordinateY[x] = int.Parse(linesplit[x].Split(",")[1]);
 
+                            // splitting each line to x coordinates
                             state[x] = linesLength[x].Split(":")[0];
                             coordinateX[x] = int.Parse(linesLength[x].Split(":")[1]);
 
-
+                            // splitting each line to x and y i.e height and width
                             if (!linesplit[x].Contains("cell"))
                             {
                                 height[x] = int.Parse(linesplit[x].Split(",")[2]);
@@ -1435,46 +1426,49 @@ namespace Life
                             }
                         }
 
+                        // checking through the different structure types
                         for (int x = 0; x < coordinateX.Length; x++)
                         {
+                            // if seed state contains cell
                             if (state[x].Contains("cell"))
                             {
                                 if (state[x].Contains("(o)"))
                                 {
-                                    CellSeed(ref lifeGen, coordinateX[x], coordinateY[x], 1);
+                                    CellSeed(ref lifeGen, coordinateX[x], coordinateY[x], (int)CellConstants.Alive);
                                 }
                                 else
                                 {
-                                    CellSeed(ref lifeGen, coordinateX[x], coordinateY[x], 0);
+                                    CellSeed(ref lifeGen, coordinateX[x], coordinateY[x], (int)CellConstants.Dead);
                                 }
                             }
-
+                            // if seed state contains ractangle
                             else if (state[x].Contains("rectangle"))
                             {
                                 if (state[x].Contains("(o)"))
                                 {
-                                    RectSeed(ref lifeGen, coordinateX[x], coordinateY[x], width[x], height[x], 1);
+                                    RectSeed(ref lifeGen, coordinateX[x], coordinateY[x], width[x], height[x], (int)CellConstants.Alive);
                                 }
                                 else
                                 {
-                                    RectSeed(ref lifeGen, coordinateX[x], coordinateY[x], width[x], height[x], 0);
+                                    RectSeed(ref lifeGen, coordinateX[x], coordinateY[x], width[x], height[x], (int)CellConstants.Dead);
                                 }
                             }
+                            // if seed state contains ellipse
                             else
                             {
                                 if (state[x].Contains("(o)"))
                                 {
-                                    EllipseSeed(ref lifeGen, coordinateX[x], coordinateY[x], width[x], height[x], 1);
+                                    EllipseSeed(ref lifeGen, coordinateX[x], coordinateY[x], width[x], height[x], (int)CellConstants.Alive);
                                 }
                                 else
                                 {
-                                    EllipseSeed(ref lifeGen, coordinateX[x], coordinateY[x], width[x], height[x], 0);
+                                    EllipseSeed(ref lifeGen, coordinateX[x], coordinateY[x], width[x], height[x], (int)CellConstants.Dead);
                                 }
                             }
                         }
                     }
 
-
+                    // old version of seed files
                     else
                     {
                         string fileContents = "";
@@ -1552,7 +1546,7 @@ namespace Life
                             Randomness(ref lifeGen, randomFactor, Alive);
                         }
 
-                        // if dimensions ar egood enough
+                        // if dimensions are good enough
                         else
                         {
                             for (int listNumber = 0; listNumber < rowsList.Count; ++listNumber)
@@ -1565,6 +1559,7 @@ namespace Life
                     fileMode = true;
                 }
 
+                // if the provided file path is invlaid
                 catch(Exception e)
                 {
                     success = false;
@@ -1655,13 +1650,13 @@ namespace Life
             // neighborhood
             if (neighborhoodType == "moore")
             {
-                WriteLine(String.Format("{0, 15} : {1, -10}", "Neighborhood", UppercaseFirst(neighborhoodType) +
-                          " (" + neighborhoodOrder + ")"));
+                WriteLine(String.Format("{0, 15} : {1, -10}", "Neighborhood", "Moore"
+                          + " (" + neighborhoodOrder + ")"));
             }
             else
             {
-                WriteLine(String.Format("{0, 15} : {1, -10}", "Neighborhood", UppercaseFirst(neighborhoodType).Substring(0,3) +
-                          UppercaseFirst(neighborhoodType).Substring(4) + " (" + neighborhoodOrder + ")"));
+                WriteLine(String.Format("{0, 15} : {1, -10}", "Neighborhood", "VonNeumann"
+                          + " (" + neighborhoodOrder + ")"));
             }
             
 
@@ -1716,6 +1711,7 @@ namespace Life
                 }
             }
         }
+
         /// <summary>
         /// method to check if spacebar should
         /// be pressed depending on step mode
@@ -1980,6 +1976,18 @@ namespace Life
             }
         }
 
+        // enumeration of repeating constants used in Main
+        public enum CellConstants
+        {
+            Alive = 1,
+            Dead = 0,
+            TwoLiveNeighbors = 2,
+            ThreeLiveNeighbors = 3,
+            Light = 4,
+            Medium = 3,
+            Dark = 2
+        }
+
         /// <summary>
         /// main takes in all methods
         /// to execute the Game of Life
@@ -1993,8 +2001,8 @@ namespace Life
             bool periodicMode = false;
             double randomFactor = 0.5;
             string inputFile = "/Users/chilla/Desktop/game-of-life/CAB201_2020S2_ProjectPartB_n10454012/Seeds(1)/Seeds/kaleidoscope1_47x47.seed";
-            int generations = 400;
-            double maxUpdateRate = 30;
+            int generations = 2250;
+            double maxUpdateRate = 100;
             bool stepMode = false;
             string neighborhoodType = "vonneumann";
             int neighborhoodOrder = 4;
@@ -2176,28 +2184,30 @@ namespace Life
                 // step mode funtionality
                 StepModeSpacebar(ref stepMode);
 
-                // update generation grid after rules of life
-                UpdateGenerationGrid(ref lifeGen, ref tempGen, grid, (int)CellConstants.Dead);
-
                 // updating memory
                 isSteady = AddToQueue(lifeGen, ref generationalMemory, memoryQueue);
 
-                if (isSteady)
+                // update generation grid after rules of life
+                UpdateGenerationGrid(ref lifeGen, ref tempGen, grid, (int)CellConstants.Dead);
+
+                if (isSteady == true)
                 {
                     grid.IsComplete = true;
                     grid.Render();
 
-                    if (fileMode == true)
+                    while(ReadKey().Key != Spacebar)
                     {
-                        WriteLine("steady state detected... periodicity = " + currentGeneration);
+                        
                     }
 
-                    else
-                    {
-                        WriteLine("steady state detected... periodicity = N/A");
-                    }
+                    grid.RevertWindow();
 
-                    ReadLine();
+                    WriteLine("steady state detected... periodicity = " + (CheckingSteady(memoryQueue)));
+
+                    while (ReadKey().Key != Spacebar)
+                    {
+
+                    }
 
                     break;
                 }
@@ -2234,17 +2244,5 @@ namespace Life
 
             WriteToFile(ref lifeGen, ref outputFile);
         }
-    }
-
-    // enumeration of repeating constants used in Main
-    public enum CellConstants
-    {
-        Alive = 1,
-        Dead = 0,
-        TwoLiveNeighbors = 2,
-        ThreeLiveNeighbors = 3,
-        Light = 4,
-        Medium = 3,
-        Dark = 2
     }
 }
