@@ -20,7 +20,7 @@ namespace Life
     // implement throws from catches for exception handling
 
     /// <summary>
-    /// interface for the get neighbors method
+    /// interface to count the neighbors of a cell
     /// </summary>
     interface INeighbors
     {
@@ -212,7 +212,7 @@ namespace Life
     }
 
     /// <summary>
-    /// method for counting old neighbors
+    /// class for counting old neighbors
     /// </summary>
     class OldNeighbors : INeighbors
     {
@@ -282,6 +282,9 @@ namespace Life
         }
     }
 
+    /// <summary>
+    /// class for the main program containing multiple checking and functionality methods
+    /// </summary>
     class Program
     {
         /// <summary>
@@ -363,7 +366,7 @@ namespace Life
         }
 
         /// <summary>
-        /// steady state implementation
+        /// method for steady state implementation
         /// </summary>
         /// <param name="lifeGen"></param>
         /// <param name="limit"></param>
@@ -387,8 +390,12 @@ namespace Life
             return false;
         }
 
-
-        static int CheckingSteady(Queue<string> memoryQueue)
+        /// <summary>
+        /// method for checking for the periodicty
+        /// </summary>
+        /// <param name="memoryQueue"></param>
+        /// <returns></returns>
+        static int Periodicty(Queue<string> memoryQueue)
         {
             string last = memoryQueue.ToList()[memoryQueue.Count-1];
 
@@ -405,7 +412,7 @@ namespace Life
         }
 
         /// <summary>
-        /// converting from string to array
+        /// method for converting from string to array
         /// </summary>
         /// <param name="arrayText"></param>
         /// <param name="upperLen"></param>
@@ -420,7 +427,7 @@ namespace Life
         /// <returns></returns>
         public static string GetStringFromArray(int[,] lst)         {             // method source: - stack overflow             return string.Join(',', lst.Cast<int>());         } 
         /// <summary>
-        /// output file check
+        /// method for output file check
         /// </summary>
         /// <param name="args"></param>
         /// <param name="index"></param>
@@ -460,7 +467,7 @@ namespace Life
         }
 
         /// <summary>
-        /// generational memroy check
+        /// method for generational memory check
         /// </summary>
         /// <param name="args"></param>
         /// <param name="index"></param>
@@ -509,7 +516,7 @@ namespace Life
         }
 
         /// <summary>
-        /// ghost mode check
+        /// method for ghost mode check
         /// </summary>
         /// <param name="args"></param>
         /// <param name="index"></param>
@@ -524,7 +531,7 @@ namespace Life
         }
 
         /// <summary>
-        /// checking for survival and birth constraints
+        /// method for checking the survival and birth constraints
         /// </summary>
         /// <param name="args"></param>
         /// <param name="index"></param>
@@ -1331,7 +1338,7 @@ namespace Life
         /// <summary>
         /// reading ellipse seeds
         /// </summary>
-        /// <param name="array"></param>
+        /// <param name="seedArray"></param>
         /// <param name="row"></param>
         /// <param name="column"></param>
         /// <param name="width"></param>
@@ -1371,6 +1378,8 @@ namespace Life
         /// <param name="columns"></param>
         /// <param name="randomFactor"></param>
         /// <param name="Alive"></param>
+        /// <param name="fileMode"></param>
+        /// <param name="success"></param>
         static void FileContents(ref int[,] lifeGen, ref string inputFile,
                                  ref int rows, ref int columns, ref double randomFactor,
                                  int Alive, ref bool fileMode, ref bool success)
@@ -1577,7 +1586,7 @@ namespace Life
         }
 
         /// <summary>
-        /// method to display runtime settings
+        /// method to display the runtime settings
         /// </summary>
         /// <param name="inputFile"></param>
         /// <param name="generations"></param>
@@ -1587,6 +1596,17 @@ namespace Life
         /// <param name="columns"></param>
         /// <param name="randomFactor"></param>
         /// <param name="stepMode"></param>
+        /// <param name="success"></param>
+        /// <param name="outputFile"></param>
+        /// <param name="generationalMemory"></param>
+        /// <param name="survivalFirstValue"></param>
+        /// <param name="survivalLastValue"></param>
+        /// <param name="birthFirstValue"></param>
+        /// <param name="birthLastValue"></param>
+        /// <param name="neighborhoodType"></param>
+        /// <param name="neighborhoodOrder"></param>
+        /// <param name="ghostMode"></param>
+        /// <param name="centreCount"></param>
         static void DisplayRuntimeSettings(ref string inputFile, ref int generations,
                                            ref double maxUpdateRate, ref bool periodicMode,
                                            ref int rows, ref int columns, ref double randomFactor,
@@ -1594,7 +1614,8 @@ namespace Life
                                            ref int generationalMemory, ref int survivalFirstValue,
                                            ref int survivalLastValue, ref int birthFirstValue,
                                            ref int birthLastValue, ref string neighborhoodType,
-                                           ref int neighborhoodOrder, ref bool ghostMode)
+                                           ref int neighborhoodOrder, ref bool ghostMode,
+                                           ref bool centreCount)
         {
             // display the game settings
             // success rate of args
@@ -1650,16 +1671,31 @@ namespace Life
             // neighborhood
             if (neighborhoodType == "moore")
             {
-                WriteLine(String.Format("{0, 15} : {1, -10}", "Neighborhood", "Moore"
+                if (!centreCount)
+                {
+                    WriteLine(String.Format("{0, 15} : {1, -10}", "Neighborhood", "Moore"
+                          + " (" + neighborhoodOrder + ") (centre-counted)"));
+                }
+                else
+                {
+                    WriteLine(String.Format("{0, 15} : {1, -10}", "Neighborhood", "Moore"
                           + " (" + neighborhoodOrder + ")"));
+                }
             }
             else
             {
-                WriteLine(String.Format("{0, 15} : {1, -10}", "Neighborhood", "VonNeumann"
+                if (!centreCount)
+                {
+                    WriteLine(String.Format("{0, 15} : {1, -10}", "Neighborhood", "VonNeumann"
+                          + " (" + neighborhoodOrder + ") (centre-counted)"));
+                }
+                else
+                {
+                    WriteLine(String.Format("{0, 15} : {1, -10}", "Neighborhood", "VonNeumann"
                           + " (" + neighborhoodOrder + ")"));
+                }    
             }
             
-
             // periodic mode
             if (periodicMode == true)
             {
@@ -1838,16 +1874,18 @@ namespace Life
 
         /// <summary>
         /// method to check a cell's status
-        /// in the next generation acocrding to the rules of life
         /// </summary>
         /// <param name="lifeGen"></param>
         /// <param name="tempGen"></param>
         /// <param name="rowCheck"></param>
         /// <param name="columnCheck"></param>
         /// <param name="periodicMode"></param>
-        /// <param name="TwoLiveNeighbors"></param>
-        /// <param name="ThreeLiveNeighbors"></param>
-        static bool RulesOfLife(ref int[,] lifeGen, ref int[,] tempGen, ref int rowCheck,
+        /// <param name="survivalConstraints"></param>
+        /// <param name="birthConstraints"></param>
+        /// <param name="neighborsnew"></param>
+        /// <param name="neighborhoodOrder"></param>
+        /// <param name="centreCount"></param>
+        static void RulesOfLife(ref int[,] lifeGen, ref int[,] tempGen, ref int rowCheck,
                                 ref int columnCheck, ref bool periodicMode, ref List<int> survivalConstraints,
                                 ref List<int> birthConstraints, INeighbors neighborsnew, ref int neighborhoodOrder,
                                 ref bool centreCount)
@@ -1857,19 +1895,16 @@ namespace Life
             int neighbors = neighborsnew.GetNeighbors(ref lifeGen, ref rowCheck, ref columnCheck, ref periodicMode, ref neighborhoodOrder,
                                                       ref centreCount);
 
-            bool isAlive = false;
-
             // WriteLine(lifeGen[rowCheck, columnCheck] == (int)CellConstants.Alive ? "alive" + neighbors : "dead" + neighbors);
 
             // final check for cell alive or dead
             // if cell alive, will it survive?
             if (lifeGen[rowCheck, columnCheck] == (int)CellConstants.Alive)
             {
-                // if cell has exactly 2 or 3 live neighbours, it survives
+                // if cell has exactly live neighbours according to the constraints, it survives
                 if (survivalConstraints.Contains(neighbors))
                 {
                     tempGen[rowCheck, columnCheck] = (int)CellConstants.Alive;
-                    isAlive = true;
                 }
 
                 // else the cell dies
@@ -1882,11 +1917,10 @@ namespace Life
             // if cell already dead, checking if cell alive in the next generation
             else
             {
-                // if dead cell has exactly 3 live neighbours, it resurrects next generation
+                // if dead cell has live neighbours according to the constraints, it resurrects next generation
                 if (birthConstraints.Contains(neighbors))
                 {
                     tempGen[rowCheck, columnCheck] = (int)CellConstants.Alive;
-                    isAlive = true;
                 }
 
                 // else the cell stays dead
@@ -1895,26 +1929,28 @@ namespace Life
                     tempGen[rowCheck, columnCheck] = (int)CellConstants.Dead;
                 }
             }
-
-            return isAlive;
         }
 
         /// <summary>
-        /// survival and birth lists for the ranges
+        /// method for survival and birth lists for the ranges
         /// </summary>
         /// <param name="survivalFirstValue"></param>
         /// <param name="survivalLastValue"></param>
         /// <param name="birthFirstValue"></param>
         /// <param name="birthLastValue"></param>
+        /// <param name="survivalConstraints"></param>
+        /// <param name="birthConstraints"></param>
         static void SurvivalAndBirthRange(ref int survivalFirstValue, ref int survivalLastValue,
                                          ref int birthFirstValue, ref int birthLastValue,
                                          ref List<int> survivalConstraints, ref List<int> birthConstraints)
         {
+            // adding the range of survival values
             for (int i = survivalFirstValue; i <= survivalLastValue; ++i)
             {
                 survivalConstraints.Add(i);
             }
 
+            // adding the range of birth values
             for (int j = birthFirstValue; j <= birthLastValue; ++j)
             {
                 birthConstraints.Add(j);
@@ -1947,42 +1983,109 @@ namespace Life
         }
 
         /// <summary>
-        /// 
+        /// method to write to the output file
         /// </summary>
         /// <param name="lifeGen"></param>
         /// <param name="fileName"></param>
         static void WriteToFile(ref int[,] lifeGen, ref string outputFile)
         {
+            // specifying the file path
             string path = outputFile;
 
+            // writing the cell coordinates to thge file in the specified format
             if (!File.Exists(path))
             {
-                // Create a file to write to.
-                using StreamWriter sw = File.CreateText(path);
-                sw.WriteLine("#version=2.0");
-
-                for (int rowcheck = 0; rowcheck < lifeGen.GetLength(0); ++rowcheck)
+                try
                 {
-                    for (int columncheck = 0; columncheck < lifeGen.GetLength(1); ++columncheck)
-                    {
-                        if (lifeGen[rowcheck, columncheck] == (int)CellConstants.Alive)
-                        {
-                            string stringToWrite = "(o) cell: " + rowcheck + ", " + columncheck;
+                    // creating the file path
+                    using StreamWriter file = File.CreateText(path);
 
-                            sw.WriteLine(stringToWrite);
+                    // adding version header
+                    file.WriteLine("#version=2.0");
+
+                    for (int rowcheck = 0; rowcheck < lifeGen.GetLength(0); ++rowcheck)
+                    {
+                        for (int columncheck = 0; columncheck < lifeGen.GetLength(1); ++columncheck)
+                        {
+                            if (lifeGen[rowcheck, columncheck] == (int)CellConstants.Alive)
+                            {
+                                string stringToWrite = "(o) cell : " + rowcheck + ", " + columncheck;
+
+                                file.WriteLine(stringToWrite);
+                            }
                         }
                     }
+                }
+
+                catch (Exception ex)
+                {
+                    WriteLine(ex.Message);
                 }
             }
         }
 
-        // enumeration of repeating constants used in Main
+        /// <summary>
+        /// method for the ghost mode logic
+        /// </summary>
+        /// <param name="memoryQueue"></param>
+        /// <param name="tempGen"></param>
+        /// <param name="rows"></param>
+        /// <param name="columns"></param>
+        static void GhostModeCells(Queue<string> memoryQueue, int[,] tempGen, int rows,
+                                   int columns)
+        {
+            String[] QueueStrings = memoryQueue.ToArray();
+
+            int history = 1;
+
+            // getting old generations
+            for (int i = QueueStrings.Length - 1; i >= 0 && history < 4; --i)
+            {
+                int[,] previousLifeGen = GetArrayFromString(QueueStrings[i], rows, columns);
+
+                for (int rowcheck = 0; rowcheck < tempGen.GetLength(0); ++rowcheck)
+                {
+                    for (int columncheck = 0; columncheck < tempGen.GetLength(1); ++columncheck)
+                    {
+                        // if the cell was dead in the current generation and alive in the previous,
+                        // it has a whole new way of coming to the final state now (3 stages)
+                        if ((tempGen[rowcheck, columncheck] == (int)CellConstants.Dead) &&
+                            (previousLifeGen[rowcheck, columncheck] == (int)CellConstants.Alive))
+                        {
+                            switch (history)
+                            {
+                                case 1:
+
+                                    tempGen[rowcheck, columncheck] = (int)CellConstants.Dark;
+                                    break;
+
+                                case 2:
+
+                                    tempGen[rowcheck, columncheck] = (int)CellConstants.Medium;
+                                    break;
+
+                                case 3:
+
+                                    tempGen[rowcheck, columncheck] = (int)CellConstants.Light;
+                                    break;
+
+                                default:
+
+                                    break;
+                            }
+                        }
+                    }
+                }
+
+                ++history;
+            }
+        }
+
+        // enumeration of repeating constants used in Main function
         public enum CellConstants
         {
             Alive = 1,
             Dead = 0,
-            TwoLiveNeighbors = 2,
-            ThreeLiveNeighbors = 3,
             Light = 4,
             Medium = 3,
             Dark = 2
@@ -2009,7 +2112,7 @@ namespace Life
             bool centreCount = true;
             bool ghostMode = false;
             int generationalMemory = 16;
-            string outputFile = "/Users/chilla/Desktop/game-of-life/outputFile/output.seed";
+            string outputFile = "/Users/chilla/Desktop/game-of-life/output.seed";
             int survivalFirstValue = 12;
             int survivalLastValue = 20;
             int birthFirstValue = 7;
@@ -2017,8 +2120,10 @@ namespace Life
             bool isSteady = false;
             bool fileMode = false;
 
+            // steady state queue variable
             Queue<string> memoryQueue = new Queue<string>();
 
+            // survival and birth list variables
             List<int> survivalConstraints = new List<int>();
 
             List<int> birthConstraints = new List<int>();
@@ -2064,7 +2169,7 @@ namespace Life
                                    ref rows, ref columns, ref randomFactor, ref stepMode, ref success,
                                    ref outputFile, ref generationalMemory, ref survivalFirstValue,
                                    ref survivalLastValue, ref birthFirstValue, ref birthLastValue,
-                                   ref neighborhoodType, ref neighborhoodOrder, ref ghostMode) ;
+                                   ref neighborhoodType, ref neighborhoodOrder, ref ghostMode, ref centreCount);
 
             // construct the game grid
             Grid grid = new Grid(rows, columns);
@@ -2091,8 +2196,10 @@ namespace Life
             // rendering updated cells
             grid.Render();
 
-            while (ReadKey().Key != Spacebar) ;
+            while (ReadKey().Key != Spacebar);
 
+            // choosing neighborhood depending on specifications
+            // of the neighborhood type variable
             INeighbors neighborsnew = new OldNeighbors();
 
             if (neighborhoodType == "moore")
@@ -2109,76 +2216,22 @@ namespace Life
             // until generations limit is reached
             while (currentGeneration < generations)
             {
-
-                int aliveCount = 0;
-
                 for (int rowcheck = 0; rowcheck < lifeGen.GetLength(0); ++rowcheck)
                 {
                     for (int columncheck = 0; columncheck < lifeGen.GetLength(1); ++columncheck)
                     {
                         
-                        // checking cell alive and dead status according rules of life
-                        bool isAlive = RulesOfLife(ref lifeGen, ref tempGen, ref rowcheck,
+                        // checking cell alive and dead status according to rules of life
+                        RulesOfLife(ref lifeGen, ref tempGen, ref rowcheck,
                                                     ref columncheck, ref periodicMode, ref survivalConstraints,
                                                     ref birthConstraints, neighborsnew, ref neighborhoodOrder, ref centreCount);
-                        if (isAlive)
-                        {
-                            ++aliveCount;
-                        }
                     }
                 }
 
-                // WriteLine("alive Count " + aliveCount);
-
-                // CellStates(state, ref spot, cell, survival, birth, ref ghostMode);
-
-                if (ghostMode)
+                // operation according to ghost mode
+                if (ghostMode == true)
                 {
-
-                    String[] QueueStrings = memoryQueue.ToArray();
-
-                    int history = 1;
-
-                    // getting old generations
-                    for (int i = QueueStrings.Length - 1; i >= 0 && history < 4; --i)
-                    {
-                        int[,] previousLifeGen = GetArrayFromString(QueueStrings[i], rows, columns);
-
-                        for (int rowcheck = 0; rowcheck < tempGen.GetLength(0); ++rowcheck)
-                        {
-                            for (int columncheck = 0; columncheck < tempGen.GetLength(1); ++columncheck)
-                            {
-
-                                if ((tempGen[rowcheck, columncheck] == (int)CellConstants.Dead) && (previousLifeGen[rowcheck, columncheck] == (int)CellConstants.Alive))
-                                {
-
-                                    switch (history)
-                                    {
-                                        case 1:
-
-                                            tempGen[rowcheck, columncheck] = (int)CellConstants.Dark;
-                                            break;
-
-                                        case 2:
-
-                                            tempGen[rowcheck, columncheck] = (int)CellConstants.Medium;
-                                            break;
-
-                                        case 3:
-
-                                            tempGen[rowcheck, columncheck] = (int)CellConstants.Light;
-                                            break;
-
-                                        default:
-
-                                            break;
-                                    }
-                                }
-                            }
-                        }
-
-                        ++history;
-                    }
+                    GhostModeCells(memoryQueue, tempGen, rows, columns);
                 }
 
                 // step mode funtionality
@@ -2190,6 +2243,7 @@ namespace Life
                 // update generation grid after rules of life
                 UpdateGenerationGrid(ref lifeGen, ref tempGen, grid, (int)CellConstants.Dead);
 
+                // if steady state was detected, complete the game and display the periodicity
                 if (isSteady == true)
                 {
                     grid.IsComplete = true;
@@ -2197,25 +2251,20 @@ namespace Life
 
                     while(ReadKey().Key != Spacebar)
                     {
-                        
+                        continue;
                     }
 
                     grid.RevertWindow();
 
-                    WriteLine("steady state detected... periodicity = " + (CheckingSteady(memoryQueue)));
+                    WriteLine("steady state detected... periodicity = " + Periodicty(memoryQueue));
 
                     while (ReadKey().Key != Spacebar)
                     {
-
+                        continue;
                     }
 
                     break;
                 }
-
-                //else
-                //{
-                //    WriteLine("steady state not detected... periodicity = N/A");
-                //}
 
                 // frame rate according update rate
                 FrameRatePerGen(ref maxUpdateRate, watch);
@@ -2229,19 +2278,18 @@ namespace Life
                 grid.Render();
             }
 
-            if (!isSteady)
+            // if no steady state is detected, complete game
+            if (isSteady == false)
             {
                 // clearing and resetting grid
                 GameOver(grid);
             }
-
             else
             {
                 grid.RevertWindow();
             }
 
-            //TODO: CALL TO WRITE FUNCTION
-
+            // calling the function to write to the output file
             WriteToFile(ref lifeGen, ref outputFile);
         }
     }
