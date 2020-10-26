@@ -1398,10 +1398,28 @@ namespace Life
             // reading from seed file coordinates
             if (inputFile.Contains(".seed"))
             {
+                bool readCheck = true;
+
                 // checking if the file can successfully be read
                 try
                 {
                     // new version of seed files
+                    StreamReader seedFile = new StreamReader(inputFile);
+                }
+
+                // if the provided file path is invlaid
+                catch (InvalidDataException ex)
+                {
+                    success = false;
+                    Error.WriteLine(ex.Message);
+                    Error.WriteLine("The provided file path is invalid");
+
+                    readCheck = false;
+                    Randomness(ref lifeGen, randomFactor, Alive);
+                }
+
+                if (readCheck == true)
+                {
                     StreamReader seedFile = new StreamReader(inputFile);
 
                     if (seedFile.ReadLine() == "#version=2.0")
@@ -1491,26 +1509,15 @@ namespace Life
                     // old version of seed files
                     else
                     {
-                        string fileContents = "";
-
                         List<int> rowsList = new List<int>();
-
                         List<int> columnsList = new List<int>();
 
-                        List<int> widthList = new List<int>();
-
-                        List<int> heightList = new List<int>();
-
-                        List<string> setting = new List<string>();
-
                         int listCount = 0;
-
                         int rowsMax = 0;
-
                         int columnsMax = 0;
-
                         bool tooBig = false;
 
+                        string fileContents;
                         // reading till the end of the file
                         while ((fileContents = seedFile.ReadLine()) != null)
                         {
@@ -1575,21 +1582,11 @@ namespace Life
                             }
                         }
                     }
-
-                    fileMode = true;
                 }
 
-                // if the provided file path is invlaid
-                catch(IndexOutOfRangeException ex)
-                {
-                    success = false;
-                    Error.WriteLine(ex.Message);
-                    Error.WriteLine("The provided file path is invalid");
-
-                    fileMode = false;
-                    Randomness(ref lifeGen, randomFactor, Alive);
-                }
+                fileMode = true;
             }
+
             // else display error and execute randomly generated cells
             else
             {
@@ -2030,14 +2027,15 @@ namespace Life
                             }
                         }
                     }
+
+                    WriteLine("An output file was successfully written to the provided file path");
                 }
 
-                catch (Exception ex)
+                catch (IndexOutOfRangeException ex)
                 {
                     Error.WriteLine(ex.Message);
+                    Error.WriteLine("The provided output file path is invalid");
                 }
-
-                WriteLine("An output file was written to the provided file path");
             }
         }
 
@@ -2116,20 +2114,20 @@ namespace Life
         static void Main(string[] args)
         {
             // declaring argument variables
-            int rows = 16;
-            int columns = 16;
+            int rows = 47;
+            int columns = 47;
             bool periodicMode = false;
             double randomFactor = 0.5;
-            string inputFile = "";
-            int generations = 50;
-            double maxUpdateRate = 100;
-            bool stepMode = true;
+            string inputFile = "/Users/chilla/Desktop/game-of-life/CAB201_2020S2_ProjectPartB_n10454012/Seeds(1)/Seeds/kaleidoscope2_47x47.seed";
+            int generations = 2250;
+            double maxUpdateRate = 500;
+            bool stepMode = false;
             string neighborhoodType = "vonneumann";
             int neighborhoodOrder = 4;
             bool centreCount = true;
             bool ghostMode = false;
-            int generationalMemory = 16;
-            string outputFile = "/Users/chilla/Desktop/game-of-life/output.seed";
+            int generationalMemory = 200;
+            string outputFile = "/Users/chilla/Desktop/game-of-life/outputFile.seed";
             int survivalFirstValue = 12;
             int survivalLastValue = 20;
             int birthFirstValue = 7;
@@ -2214,7 +2212,7 @@ namespace Life
             // grid before generation rules of life execution
             UpdateInitialGrid(ref lifeGen, grid);
 
-            while (ReadKey().Key != Spacebar);
+            // while (ReadKey().Key != Spacebar);
 
             // rendering updated cells
             grid.Render();
