@@ -1989,8 +1989,8 @@ namespace Life
         /// method to write to the output file
         /// </summary>
         /// <param name="lifeGen"></param>
-        /// <param name="fileName"></param>
-        static void WriteToFile(ref int[,] lifeGen, ref string outputFile)
+        /// <param name="outputFile"></param>
+        private static void WriteToFile(ref int[,] lifeGen, ref string outputFile)
         {
             // specifying the file path
             string path = outputFile;
