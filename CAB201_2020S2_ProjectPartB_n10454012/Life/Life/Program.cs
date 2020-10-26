@@ -15,7 +15,10 @@ namespace Life
     // encapsulation has been used here as interface maps on to the classes as public methods
     // make write to file private and reads also private
 
-    // the getneighbors method in abstract Ineighbors interface has been us    // the get neighbors method in Ineighbors worked differently in moore nieghborhood, von neumann neighborhood, depending on the nieghborhood requested in runtime which is runtime polymorphism
+    // the getneighbors method in abstract Ineighbors interface has been us
+
+    // the get neighbors method in Ineighbors worked differently in moore nieghborhood, von neumann neighborhood,
+    // depending on the nieghborhood requested in runtime which is runtime polymorphism
 
     // implement throws from catches for exception handling
 
