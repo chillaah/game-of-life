@@ -449,11 +449,12 @@ namespace Life
                     }
                 }
                 // no paramter provided
-                catch
+                catch(IndexOutOfRangeException ex)
                 {
                     outputFile = "";
 
                     success = false;
+                    Error.WriteLine(ex.Message);
                     Error.WriteLine("1 output file parameter is missing");
                 }
             }
@@ -469,16 +470,16 @@ namespace Life
         public static void GenerationalMemory(string[] args, int index, ref int generationalMemory, ref bool success)
         {
             // --memory args
-            if (args[index] == "--generations")
+            if (args[index] == "--memory")
             {
                 // checking if parameter provided
                 try
                 {
-                    // if parameter is integer, store generations
+                    // if parameter is integer, store generational memory
                     if (int.TryParse(args[index + 1], out generationalMemory))
                     {
                         // if integer >= 4 and <= 512, keep generational memory
-                        // else display error and assign defualt generations
+                        // else display error and assign defualt generational memory
                         if (!((4 <= generationalMemory) && (generationalMemory <= 512)))
                         {
                             generationalMemory = 16;
@@ -487,7 +488,7 @@ namespace Life
                             Error.WriteLine("Generational memory must be an integer betwen 4 and 512 (inclusive)");
                         }
                     }
-                    // else display error and assign default generations
+                    // else display error and assign default generational memory
                     else
                     {
                         generationalMemory = 16;
@@ -497,7 +498,7 @@ namespace Life
                     }
                 }
                 // no parameter provided
-                // display error and assign defult generations
+                // display error and assign defult generational memory
                 catch
                 {
                     generationalMemory = 16;
@@ -616,26 +617,28 @@ namespace Life
                             try
                             {
                                 // checking if survival value is provided as an integer
-                                int.TryParse(args[index + 1], out int survivalValue);
-
-                                if (!(survivalValue > 0))
+                                if (int.TryParse(args[index + 1], out int survivalValue))
                                 {
-                                    survivalFirstValue = 3;
-                                    survivalLastValue = 3;
 
-                                    success = false;
-                                    Error.WriteLine("survival must be a positive non-zero value");
-                                }
-                                else
-                                {
-                                    survivalFirstValue = survivalValue;
-                                    survivalLastValue = survivalValue;
-                                }
+                                    if (!(survivalValue > 0))
+                                    {
+                                        survivalFirstValue = 3;
+                                        survivalLastValue = 3;
 
-                                // adding the range values to a list of survival integers
-                                for (int j = survivalFirstValue; j <= survivalLastValue; ++j)
-                                {
-                                    survivalConstraints.Add(i);
+                                        success = false;
+                                        Error.WriteLine("survival must be a positive non-zero value");
+                                    }
+                                    else
+                                    {
+                                        survivalFirstValue = survivalValue;
+                                        survivalLastValue = survivalValue;
+                                    }
+
+                                    // adding the range values to a list of survival integers
+                                    for (int j = survivalFirstValue; j <= survivalLastValue; ++j)
+                                    {
+                                        survivalConstraints.Add(i);
+                                    }
                                 }
                             }
                             // survival value was not provided as an integer
@@ -751,26 +754,27 @@ namespace Life
                             try
                             {
                                 // checking if birth value is provided as an integer
-                                int.TryParse(args[index + 1], out int birthValue);
-
-                                if (!(birthValue > 0))
+                                if (int.TryParse(args[index + 1], out int birthValue))
                                 {
-                                    birthFirstValue = 3;
-                                    birthLastValue = 3;
+                                    if (!(birthValue > 0))
+                                    {
+                                        birthFirstValue = 3;
+                                        birthLastValue = 3;
 
-                                    success = false;
-                                    Error.WriteLine("birth must be a positive non-zero value");
-                                }
-                                else
-                                {
-                                    birthFirstValue = birthValue;
-                                    birthLastValue = birthValue;
-                                }
+                                        success = false;
+                                        Error.WriteLine("birth must be a positive non-zero value");
+                                    }
+                                    else
+                                    {
+                                        birthFirstValue = birthValue;
+                                        birthLastValue = birthValue;
+                                    }
 
-                                // adding the range values to a list of birth integers
-                                for (int j = birthFirstValue; j <= birthLastValue; ++j)
-                                {
-                                    birthConstraints.Add(i);
+                                    // adding the range values to a list of birth integers
+                                    for (int j = birthFirstValue; j <= birthLastValue; ++j)
+                                    {
+                                        birthConstraints.Add(i);
+                                    }
                                 }
                             }
                             // birth value was not provided as an integer
@@ -929,7 +933,6 @@ namespace Life
                     centreCount = false;
 
                     success = false;
-
                     Error.WriteLine(ex.Message);
                     ++missing;
                 }
@@ -943,16 +946,19 @@ namespace Life
                     case 1 :
 
                         Error.WriteLine("1 neighbour parameter is missing");
+                        success = false;
                         break;
 
                     case 2 :
 
                         Error.WriteLine("2 neighbour parameters are missing");
+                        success = false;
                         break;
 
                     case 3 :
 
                         Error.WriteLine("3 neighbour parameters are missing");
+                        success = false;
                         break;
 
                     default:
@@ -2028,8 +2034,10 @@ namespace Life
 
                 catch (Exception ex)
                 {
-                    WriteLine(ex.Message);
+                    Error.WriteLine(ex.Message);
                 }
+
+                WriteLine("An output file was written to the provided file path");
             }
         }
 
@@ -2108,12 +2116,12 @@ namespace Life
         static void Main(string[] args)
         {
             // declaring argument variables
-            int rows = 47;
-            int columns = 47;
+            int rows = 16;
+            int columns = 16;
             bool periodicMode = false;
             double randomFactor = 0.5;
-            string inputFile = "/Users/chilla/Desktop/game-of-life/CAB201_2020S2_ProjectPartB_n10454012/Seeds(1)/Seeds/kaleidoscope1_47x47.seed";
-            int generations = 2250;
+            string inputFile = "";
+            int generations = 50;
             double maxUpdateRate = 100;
             bool stepMode = true;
             string neighborhoodType = "vonneumann";
@@ -2134,19 +2142,18 @@ namespace Life
 
             // survival and birth list variables
             List<int> survivalConstraints = new List<int>();
-
             List<int> birthConstraints = new List<int>();
-
-            // getting the survival and birth ranges
-            SurvivalAndBirthRange(ref survivalFirstValue, ref survivalLastValue,
-                                  ref birthFirstValue, ref birthLastValue, ref survivalConstraints,
-                                  ref birthConstraints);
 
             // success variable
             bool success = true;
 
             // args provided check variable
             bool argsProvided = false;
+
+            // getting the survival and birth ranges
+            SurvivalAndBirthRange(ref survivalFirstValue, ref survivalLastValue,
+                                  ref birthFirstValue, ref birthLastValue, ref survivalConstraints,
+                                  ref birthConstraints);
 
             // performing checks
             // program should run in default values if no arguments are provided
@@ -2175,7 +2182,7 @@ namespace Life
 
             // seed file reading and checking
             FileContents(ref lifeGen, ref inputFile, ref rows,
-                         ref columns, ref randomFactor, (int)CellConstants.Alive, ref success, ref fileMode);
+                         ref columns, ref randomFactor, (int)CellConstants.Alive, ref fileMode, ref success);
 
             // displaying runtime settings
             DisplayRuntimeSettings(ref inputFile, ref generations, ref maxUpdateRate, ref periodicMode,
@@ -2207,10 +2214,10 @@ namespace Life
             // grid before generation rules of life execution
             UpdateInitialGrid(ref lifeGen, grid);
 
+            while (ReadKey().Key != Spacebar);
+
             // rendering updated cells
             grid.Render();
-
-            while (ReadKey().Key != Spacebar);
 
             // choosing neighborhood depending on specifications
             // of the neighborhood type variable
