@@ -40,6 +40,7 @@ Has no errors or warnings at execution
 Command line arguments must be provided followed with *"--"* at the start
 The usable command line arguments are listed below,
 
+- Rows & Columns := 8--dimensions < rows > < columns >* 
 - Neighbours := *--neighbour < type > < order > < centre-count >* 
 - Birth := *--birth < param1 > < param2 > < param3 > ...* 
 - Survival := *--survival < param1 > < param2 > < param3 > ...* 

@@ -546,27 +546,34 @@ namespace Life
             {
                 survivalConstraints.Clear();
 
-                int x = 0;
+                int count = 0;
 
-                while (index + x < args.Length - 1)
+                // loop to include all parameters until the next argument call
+                while (index + count < args.Length - 1)
                 {
+                    int pos = index + count;
+
                     try
                     {
-                        if (!args[index + x + 1].Contains("--"))
+                        // if the next argument call is not detected
+                        if (!args[pos + 1].Contains("--"))
                         {
-                            if (index + x == args.Length - 2)
+                            if (index + count == args.Length - 2)
                             {
-                                inputSurvival += args[index + x + 1];
+                                inputSurvival += args[pos + 1];
                             }
                             else
                             {
-                                inputSurvival += args[index + x + 1] + " ";
+                                inputSurvival += args[pos + 1] + " ";
                             }
-
-                            if (args[index + 1 + x].Contains("..."))
+                            // if a range is supplied for survival parameter(s)
+                            if (args[pos + 1].Contains("..."))
                             {
-                                int first = int.Parse(args[(index + 1) + x].Split("...")[0]);
-                                int last = int.Parse(args[(index + 1) + x].Split("...")[1]);
+                                // seperating first value from range parameter
+                                int first = int.Parse(args[(pos - count + 1) + count].Split("...")[0]);
+
+                                // seperating second value from range parameter
+                                int last = int.Parse(args[(pos - count + 1) + count].Split("...")[1]);
 
                                 for (int k = first; k <= last; ++k)
                                 {
@@ -576,33 +583,36 @@ namespace Life
                             }
                             else
                             {
-                                if (int.Parse(args[index + x + 1]) < -1)
+                                // if survival parameter is less than zero
+                                if (int.Parse(args[pos + 1]) < 0)
                                 {
                                     Error.WriteLine("Survival value(s) must be a positive integer");
                                 }
                                 else
                                 {
-                                    survivalConstraints.Add(int.Parse(args[index + x + 1]));
+                                    survivalConstraints.Add(int.Parse(args[pos + 1]));
                                 }
                             }
-                            ++x;
+                            ++count;
                         }
+                        // if detected, break out
                         else
                         {
                             break;
                         }
                     }
+                    // invalid format or missing parameter
                     catch (FormatException ex)
                     {
                         survivalConstraints.Add(2);
                         survivalConstraints.Add(3);
 
                         inputSurvival = "2...3";
-                        ++x;
+                        ++count;
 
                         success = false;
                         Error.WriteLine(ex.Message);
-                        Error.WriteLine("1 or more survival parameter(s) are not in the correct format");
+                        Error.WriteLine("1 or more survival parameter(s) are not in the correct format or missing");
                     }
                 }
 
@@ -617,27 +627,34 @@ namespace Life
             {
                 birthConstraints.Clear();
 
-                int x = 0;
+                int count = 0;
 
-                while (index + x < args.Length - 1)
+                // loop to include all parameters until the next argument call
+                while (index + count < args.Length - 1)
                 {
+                    int pos = index + count;
+
                     try
                     {
-                        if (!args[index + x + 1].Contains("--"))
+                        // if the next argument call is not detected
+                        if (!args[pos + 1].Contains("--"))
                         {
-                            if (index + x == args.Length - 2)
+                            if (index + count == args.Length - 2)
                             {
-                                inputBirth += args[index + x + 1];
+                                inputBirth += args[pos + 1];
                             }
                             else
                             {
-                                inputBirth += args[index + x + 1] + " ";
+                                inputBirth += args[pos + 1] + " ";
                             }
-
-                            if (args[index + 1 + x].Contains("..."))
+                            // if a range is supplied for birth parameter(s)
+                            if (args[pos + 1].Contains("..."))
                             {
-                                int first = int.Parse(args[(index + 1) + x].Split("...")[0]);
-                                int last = int.Parse(args[(index + 1) + x].Split("...")[1]);
+                                // seperating first value from range parameter
+                                int first = int.Parse(args[(pos - count + 1) + count].Split("...")[0]);
+
+                                // seperating second value from range parameter
+                                int last = int.Parse(args[(pos - count + 1) + count].Split("...")[1]);
 
                                 for (int k = first; k <= last; ++k)
                                 {
@@ -647,32 +664,36 @@ namespace Life
                             }
                             else
                             {
-                                if (int.Parse(args[index + x + 1]) < -1)
+                                // if birth parameter is less than zero
+                                if (int.Parse(args[pos + 1]) < 0)
                                 {
                                     Error.WriteLine("Birth value(s) must be a positive integer");
                                 }
                                 else
                                 {
-                                    birthConstraints.Add(int.Parse(args[index + x + 1]));
+                                    birthConstraints.Add(int.Parse(args[pos + 1]));
                                 }
                             }
-                            ++x;
+                            ++count;
                         }
+                        // if detected, break out
                         else
                         {
                             break;
                         }
                     }
+                    // invalid format or missing parameter
                     catch (FormatException ex)
                     {
+                        birthConstraints.Add(2);
                         birthConstraints.Add(3);
 
-                        inputBirth = "3";
-                        ++x;
+                        inputBirth = "2...3";
+                        ++count;
 
                         success = false;
                         Error.WriteLine(ex.Message);
-                        Error.WriteLine("1 or more birth parameter(s) are not in the correct format");
+                        Error.WriteLine("1 or more birth parameter(s) are not in the correct format or missing");
                     }
                 }
 
