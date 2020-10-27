@@ -304,10 +304,12 @@ namespace Life
         /// <param name="inputSurvival"></param>
         /// <param name="inputBirth"></param>
         public static void PerformingChecks(string[] args, ref bool success, ref int rows,
-                                     ref int columns, ref bool periodicMode, ref double randomFactor,
-                                     ref string inputFile, ref int generations, ref double maxUpdateRate,
-                                     ref bool stepMode, ref string neighborhoodType, ref int neighborhoodOrder,
-                                     ref bool centreCount, ref List<int> survivalConstraints,
+                                     ref int columns, ref bool periodicMode,
+                                     ref double randomFactor,ref string inputFile,
+                                     ref int generations, ref double maxUpdateRate,
+                                     ref bool stepMode, ref string neighborhoodType,
+                                     ref int neighborhoodOrder, ref bool centreCount,
+                                     ref List<int> survivalConstraints,
                                      ref List<int> birthConstraints, ref bool ghostMode,
                                      ref int generationalMemory, ref string outputFile,
                                      ref string inputSurvival, ref string inputBirth)
@@ -590,7 +592,8 @@ namespace Life
                                 }
                                 else
                                 {
-                                    survivalConstraints.Add(int.Parse(args[pos + 1]));
+                                    int survivalValue = int.Parse(args[pos + 1]);
+                                    survivalConstraints.Add(survivalValue);
                                 }
                             }
                             ++count;
@@ -671,7 +674,8 @@ namespace Life
                                 }
                                 else
                                 {
-                                    birthConstraints.Add(int.Parse(args[pos + 1]));
+                                    int birthValue = int.Parse(args[pos + 1]);
+                                    birthConstraints.Add(birthValue);
                                 }
                             }
                             ++count;
@@ -2194,6 +2198,7 @@ namespace Life
             }
 
             // calling the function to write to the output file
+            // if the file path is provided and valid
             WriteToFile(ref lifeGen, ref outputFile);
         }
     }
