@@ -1,7 +1,7 @@
 ---
 title: Major Project Life - Part 2
 author: Chiran Walisundara - n10454012
-date: 17/10/2020
+date: 25/10/2020
 ---
 
 ## Build Instructions
