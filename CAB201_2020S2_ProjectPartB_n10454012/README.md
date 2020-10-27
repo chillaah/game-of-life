@@ -40,13 +40,19 @@ Has no errors or warnings at execution
 Command line arguments must be provided followed with *"--"* at the start
 The usable command line arguments are listed below,
 
-- Rows & Columns := 8--dimensions < rows > < columns >* 
+- Rows & Columns := *--dimensions < rows > < columns >* 
+- Periodic Behaviour := *--periodic*
+- Random Factor := *--random < probability >* 
+- Input file := *--seed < filename >*
+- Generations := *--generations < number >*
+- Max. Update Rate := *--max-update < ups >*
+- Step Mode := *--step*
 - Neighbours := *--neighbour < type > < order > < centre-count >* 
 - Birth := *--birth < param1 > < param2 > < param3 > ...* 
 - Survival := *--survival < param1 > < param2 > < param3 > ...* 
 - Output file:= -*-output < filename >*
 - Generational Memory := *--memory < number >*
-- Ghost mode := --ghost 
+- Ghost mode := *--ghost* 
 
 ## Notes 
 
