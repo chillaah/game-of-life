@@ -6,7 +6,7 @@ date: 17/10/2020
 
 ## Build Instructions
 
-Program was built and developed using **Visual Studio 2019**
+Program was built and developed using **Visual Studio 2019.**  
 Has no errors or warnings at execution  
 
 ## Usage 
