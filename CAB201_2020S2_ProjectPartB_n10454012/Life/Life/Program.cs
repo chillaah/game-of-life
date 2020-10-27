@@ -312,7 +312,8 @@ namespace Life
                                      ref List<int> survivalConstraints,
                                      ref List<int> birthConstraints, ref bool ghostMode,
                                      ref int generationalMemory, ref string outputFile,
-                                     ref string inputSurvival, ref string inputBirth)
+                                     ref string inputSurvival, ref string inputBirth,
+                                     ref bool surCLIWorks, ref bool birCLIWorks)
         {
             // performing argument check until the end of arguemnts
             for (int index = 0; index < args.Length; ++index)
@@ -344,7 +345,8 @@ namespace Life
 
                 // survival and birth check
                 SurvivalAndBirth(args, index, ref survivalConstraints, ref birthConstraints,
-                                 ref success, ref inputSurvival, ref inputBirth);
+                                 ref success, ref inputSurvival, ref inputBirth,
+                                 ref surCLIWorks, ref birCLIWorks);
 
                 // ghost mode check
                 GhostMode(args, index, ref ghostMode);
@@ -541,7 +543,8 @@ namespace Life
         /// <param name="inputBirth"></param>
         public static void SurvivalAndBirth(string[] args, int index, ref List<int> survivalConstraints,
                                      ref List<int> birthConstraints, ref bool success,
-                                     ref string inputSurvival, ref string inputBirth)
+                                     ref string inputSurvival, ref string inputBirth,
+                                     ref bool surCLIWorks, ref bool birCLIWorks)
         {
             // --survival args
             if (args[index] == "--survival")
@@ -622,6 +625,7 @@ namespace Life
                 if (inputSurvival == "")
                 {
                     success = false;
+                    surCLIWorks = false;
                 }
             }
 
@@ -704,6 +708,7 @@ namespace Life
                 if (inputBirth == "")
                 {
                     success = false;
+                    birCLIWorks = false;
                 }
             }
         }
@@ -1293,17 +1298,18 @@ namespace Life
             // reading from seed file coordinates
             if (inputFile.Contains(".seed"))
             {
+                WriteLine("hi");
+
                 bool readCheck = true;
 
                 // checking if the file can successfully be read
                 try
                 {
-                    // new version of seed files
                     StreamReader seedFile = new StreamReader(inputFile);
                 }
 
                 // if the provided file path is invlaid
-                catch (DirectoryNotFoundException ex)
+                catch (FileNotFoundException ex)
                 {
                     success = false;
                     Error.WriteLine(ex.Message);
@@ -1319,7 +1325,6 @@ namespace Life
 
                     if (seedFile.ReadLine() == "#version=2.0")
                     {
-
                         // reading the whole seed file
                         string readall = seedFile.ReadToEnd().Trim();
 
@@ -1413,12 +1418,13 @@ namespace Life
                         List<int> rowsList = new List<int>();
                         List<int> columnsList = new List<int>();
 
+                        string fileContents = "";
+
                         int listCount = 0;
                         int rowsMax = 0;
                         int columnsMax = 0;
                         bool tooBig = false;
 
-                        string fileContents;
                         // reading till the end of the file
                         while ((fileContents = seedFile.ReadLine()) != null)
                         {
@@ -1578,7 +1584,6 @@ namespace Life
                 WriteLine(String.Format("{0, 15} : {1, -10}", "Rules", "S( 2...3 ) B( 3 )"));
 
             }
-
             else if (inputSurvival == "")
             {
                 WriteLine(String.Format("{0, 15} : {1, -10}", "Rules", "S( 2...3 )  B( " + inputBirth + " )"));
@@ -1856,19 +1861,50 @@ namespace Life
                     tempGen[rowCheck, columnCheck] = (int)CellConstants.Dead;
                 }
             }
+
+            
         }
 
         /// <summary>
         /// method to call the ending of the game
         /// </summary>
         /// <param name="grid"></param>
-        public static void GameOver(Grid grid)
+        public static void GameOver(Grid grid, ref bool isSteady)
         {
             // set complete marker as true
             grid.IsComplete = true;
 
             // render updates to the console window (grid should now display COMPLETE)...
             grid.Render();
+
+            if (isSteady == false)
+            {
+                // console closes if spacebar is pressed after the program ends
+                while (true)
+                {
+                    if (ReadKey().Key == Spacebar)
+                    {
+                        break;
+                    }
+                }
+
+                grid.RevertWindow();
+
+                WriteLine("steady state not detected...");
+
+                // console closes if spacebar is pressed after the program ends
+                while (true)
+                {
+                    if (ReadKey().Key == Spacebar)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            grid.RevertWindow();
+
+            WriteLine("Press spacebar to close the program...");
 
             // console closes if spacebar is pressed after the program ends
             while (true)
@@ -2018,7 +2054,7 @@ namespace Life
             string inputFile = "";
             int generations = 50;
             double maxUpdateRate = 5;
-            bool stepMode = false;
+            bool stepMode = true;
             string neighborhoodType = "moore";
             int neighborhoodOrder = 1;
             bool centreCount = false;
@@ -2027,6 +2063,11 @@ namespace Life
             string outputFile = "";
             bool isSteady = false;
             bool fileMode = false;
+            int survivalFirst = 2;
+            int survivalLast = 3;
+            int birthOnly = 3;
+            bool surCLIWorks = true;
+            bool burCLIWorks = true;
 
             // input survival and birth value string
             string inputSurvival = "";
@@ -2062,9 +2103,24 @@ namespace Life
                                  ref neighborhoodType, ref neighborhoodOrder, ref centreCount,
                                  ref survivalConstraints, ref birthConstraints, ref ghostMode,
                                  ref generationalMemory, ref outputFile, ref inputSurvival,
-                                 ref inputBirth);
+                                 ref inputBirth, ref surCLIWorks, ref burCLIWorks);
             }
 
+            if (surCLIWorks == false || inputSurvival == "")
+            {
+                survivalConstraints.Add(survivalFirst);
+
+                survivalConstraints.Add(survivalLast);
+
+                inputSurvival = "2...3";
+            }
+
+            if (burCLIWorks == false || inputBirth == "")
+            {
+                birthConstraints.Add(birthOnly);
+
+                inputBirth = "3";
+            }
 
             // the game's main 2 dimensional array
             // stores all cell alive and dead statuses
@@ -2080,6 +2136,7 @@ namespace Life
                                    ref outputFile, ref generationalMemory, ref neighborhoodType,
                                    ref neighborhoodOrder, ref ghostMode, ref centreCount,
                                    ref argsProvided, ref inputSurvival, ref inputBirth);
+
 
             // construct the game grid
             Grid grid = new Grid(rows, columns);
@@ -2131,8 +2188,8 @@ namespace Life
 
                         // checking cell alive and dead status according to rules of life
                         RulesOfLife(ref lifeGen, ref tempGen, ref rowcheck,
-                                                    ref columncheck, ref periodicMode, ref survivalConstraints,
-                                                    ref birthConstraints, neighborsnew, ref neighborhoodOrder, ref centreCount);
+                                    ref columncheck, ref periodicMode, ref survivalConstraints,
+                                    ref birthConstraints, neighborsnew, ref neighborhoodOrder, ref centreCount);
                     }
                 }
 
@@ -2150,6 +2207,9 @@ namespace Life
 
                 // update generation grid after rules of life
                 UpdateGenerationGrid(ref lifeGen, ref tempGen, grid, (int)CellConstants.Dead);
+
+                // rendering updated cells
+                grid.Render();
 
                 // if steady state was detected, complete the game and display the periodicity
                 if (isSteady == true)
@@ -2186,16 +2246,18 @@ namespace Life
                 grid.Render();
             }
 
-            // if no steady state is detected, complete game
-            if (isSteady == false)
-            {
-                // clearing and resetting grid
-                GameOver(grid);
-            }
-            else
-            {
-                grid.RevertWindow();
-            }
+            GameOver(grid, ref isSteady);
+
+            //// if no steady state is detected, complete game
+            //if (isSteady == false)
+            //{
+            //    // clearing and resetting grid
+            //    GameOver(grid, ref isSteady);
+            //}
+            //else
+            //{
+            //    GameOver(grid, ref isSteady);
+            //}
 
             // calling the function to write to the output file
             // if the file path is provided and valid
