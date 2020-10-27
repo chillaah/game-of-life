@@ -424,7 +424,13 @@ namespace Life
         /// <returns></returns>
         public static int[,] GetArrayFromString(string arrayText, int upperLen, int lowerLen)         {
             // method souce: - stack overflow
-            string[] parsed = arrayText.Split(",");             int[,] output = new int[upperLen, lowerLen];              for (var upper = 0; upper < upperLen; upper++)                 for (var lower = 0; lower < lowerLen; lower++)                      output[upper, lower] = int.Parse(parsed[(upper * lowerLen) + lower]);              return output;         }
+            string[] parsed = arrayText.Split(",");             int[,] output = new int[upperLen, lowerLen];              for (var upper = 0; upper < upperLen; upper++)
+            {
+                for (var lower = 0; lower < lowerLen; lower++)
+                {
+                    output[upper, lower] = int.Parse(parsed[(upper * lowerLen) + lower]);
+                }
+            }                              return output;         }
 
         /// <summary>
         /// converting from array to string
