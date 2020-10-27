@@ -41,7 +41,7 @@ Command line arguments must be provided followed with *"--"* at the start
 The usable command line arguments are listed below,
 
 - Neighbours := --neighbour <type> <order> <centre-count> 
-- Birth := *--birth <param1> <param2> <param3> ...* 
+- Birth := *--birth < param1 > < param2 > < param3 > ...* 
 - Survival := --survival <param1> <param2> <param3> ... 
 - Output file:= --output <filename> 
 - Generational Memory := --memory <number> 
