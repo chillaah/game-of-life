@@ -1,4 +1,0 @@
-#version=2.0
-(o) cell : 1, 2
-(o) cell : 2, 1
-(o) cell : 2, 2
