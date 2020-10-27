@@ -191,9 +191,19 @@ namespace Life
                     // von neumann neighbor counting logic
                     if (proceed == true)
                     {
-                        if ((Abs(rowCoordinate) + Abs(columnCoordinate)) <= neighborhoodOrder)
+                        if (neighborhoodOrder != 1)
                         {
-                            neighbors += lifeGen[rowNumberCurrent, columnNumberCurrent];
+                            if ((Abs(rowCoordinate) + Abs(columnCoordinate)) <= neighborhoodOrder)
+                            {
+                                neighbors += lifeGen[rowNumberCurrent, columnNumberCurrent];
+                            }
+                        }
+                        else if (neighborhoodOrder == 1)
+                        {
+                            if ((Pow(rowCoordinate, 2) + Pow(columnCoordinate, 2)) <= Pow(neighborhoodOrder, 2))
+                            {
+                                neighbors += lifeGen[rowNumberCurrent, columnNumberCurrent];
+                            }
                         }
                     }
                 }
@@ -305,7 +315,7 @@ namespace Life
         /// <param name="inputBirth"></param>
         public static void PerformingChecks(string[] args, ref bool success, ref int rows,
                                      ref int columns, ref bool periodicMode,
-                                     ref double randomFactor,ref string inputFile,
+                                     ref double randomFactor, ref string inputFile,
                                      ref int generations, ref double maxUpdateRate,
                                      ref bool stepMode, ref string neighborhoodType,
                                      ref int neighborhoodOrder, ref bool centreCount,
@@ -584,7 +594,6 @@ namespace Life
                                 {
                                     survivalConstraints.Add(k);
                                 }
-
                             }
                             else
                             {
@@ -610,20 +619,22 @@ namespace Life
                     // invalid format or missing parameter
                     catch (FormatException ex)
                     {
-                        survivalConstraints.Add(2);
-                        survivalConstraints.Add(3);
-
-                        inputSurvival = "2...3";
                         ++count;
 
                         success = false;
                         Error.WriteLine(ex.Message);
-                        Error.WriteLine("1 or more survival parameter(s) are not in the correct format or missing");
+                        Error.WriteLine("1 or more survival parameter(s) " +
+                                        "are not in the correct format or missing");
                     }
                 }
-
+                // if empty, assign default values
                 if (inputSurvival == "")
                 {
+                    survivalConstraints.Add(2);
+                    survivalConstraints.Add(3);
+
+                    inputSurvival = "2...3";
+
                     success = false;
                     surCLIWorks = false;
                 }
@@ -667,7 +678,6 @@ namespace Life
                                 {
                                     birthConstraints.Add(k);
                                 }
-
                             }
                             else
                             {
@@ -693,20 +703,21 @@ namespace Life
                     // invalid format or missing parameter
                     catch (FormatException ex)
                     {
-                        birthConstraints.Add(2);
-                        birthConstraints.Add(3);
-
-                        inputBirth = "2...3";
                         ++count;
 
                         success = false;
                         Error.WriteLine(ex.Message);
-                        Error.WriteLine("1 or more birth parameter(s) are not in the correct format or missing");
+                        Error.WriteLine("1 or more birth parameter(s) " +
+                                        "are not in the correct format or missing");
                     }
                 }
-
+                // if empty, assign default values
                 if (inputBirth == "")
                 {
+                    birthConstraints.Add(3);
+
+                    inputBirth = "3";
+
                     success = false;
                     birCLIWorks = false;
                 }
@@ -739,12 +750,12 @@ namespace Life
                     // if moore neighborhood was passed
                     if (args[index + 1].ToLower().Equals("moore"))
                     {
-
+                        neighborhoodType = args[index + 1].ToLower();
                     }
                     // if von neumann neighborhood was passed
                     else if (args[index + 1].ToLower().Equals("vonneumann"))
                     {
-                        neighborhoodType = args[index + 1];
+                        neighborhoodType = args[index + 1].ToLower();
                     }
                     // invalid neighborhood passed
                     else
@@ -1234,7 +1245,8 @@ namespace Life
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <param name="state"></param>
-        public static void RectSeed(ref int[,] seedArray, int row, int column, int width, int height, int state)
+        public static void RectSeed(ref int[,] seedArray, int row, int column, int width, int height,
+                                    int state)
         {
             // rectangle logic
             for (int x = row; x <= height; ++x)
@@ -1255,7 +1267,8 @@ namespace Life
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <param name="state"></param>
-        public static void EllipseSeed(ref int[,] seedArray, int row, int column, int width, int height, int state)
+        public static void EllipseSeed(ref int[,] seedArray, int row, int column, int width, int height,
+                                       int state)
         {
             // determining the centre
             double centreX = (double)(row + height) / 2;
@@ -1298,8 +1311,6 @@ namespace Life
             // reading from seed file coordinates
             if (inputFile.Contains(".seed"))
             {
-                WriteLine("hi");
-
                 bool readCheck = true;
 
                 // checking if the file can successfully be read
@@ -1820,8 +1831,8 @@ namespace Life
         /// <param name="centreCount"></param>
         public static void RulesOfLife(ref int[,] lifeGen, ref int[,] tempGen, ref int rowCheck,
                                 ref int columnCheck, ref bool periodicMode, ref List<int> survivalConstraints,
-                                ref List<int> birthConstraints, INeighbors neighborsnew, ref int neighborhoodOrder,
-                                ref bool centreCount)
+                                ref List<int> birthConstraints, INeighbors neighborsnew,
+                                ref int neighborhoodOrder, ref bool centreCount)
         {
             // calling from the GetNeighbors method
             // obtaining nieghbors in current cell
@@ -1862,7 +1873,7 @@ namespace Life
                 }
             }
 
-            
+
         }
 
         /// <summary>
@@ -2054,7 +2065,7 @@ namespace Life
             string inputFile = "";
             int generations = 50;
             double maxUpdateRate = 5;
-            bool stepMode = true;
+            bool stepMode = false;
             string neighborhoodType = "moore";
             int neighborhoodOrder = 1;
             bool centreCount = false;
@@ -2246,18 +2257,9 @@ namespace Life
                 grid.Render();
             }
 
+            // depending on steady state detection,
+            // the game is completed and the relavant message is displayed
             GameOver(grid, ref isSteady);
-
-            //// if no steady state is detected, complete game
-            //if (isSteady == false)
-            //{
-            //    // clearing and resetting grid
-            //    GameOver(grid, ref isSteady);
-            //}
-            //else
-            //{
-            //    GameOver(grid, ref isSteady);
-            //}
 
             // calling the function to write to the output file
             // if the file path is provided and valid
