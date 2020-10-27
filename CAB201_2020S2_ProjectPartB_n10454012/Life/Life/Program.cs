@@ -311,8 +311,8 @@ namespace Life
                                      ref bool stepMode, ref string neighborhoodType, ref int neighborhoodOrder,
                                      ref bool centreCount, ref List<int> survivalConstraints,
                                      ref List<int> birthConstraints, ref bool ghostMode,
-                                     ref int generationalMemory, ref string outputFile, ref int survivalFirstValue,
-                                     ref int survivalLastValue, ref int birthFirstValue, ref int birthLastValue)
+                                     ref int generationalMemory, ref string outputFile,
+                                     ref string inputSurvival, ref string inputBirth)
         {
             // performing argument check until the end of arguemnts
             for (int index = 0; index < args.Length; ++index)
@@ -344,8 +344,7 @@ namespace Life
 
                 // survival and birth check
                 SurvivalAndBirth(args, index, ref survivalConstraints, ref birthConstraints,
-                                 ref success, ref survivalFirstValue, ref survivalLastValue,
-                                 ref birthFirstValue, ref birthLastValue);
+                                 ref success, ref inputSurvival, ref inputBirth);
 
                 // ghost mode check
                 GhostMode(args, index, ref ghostMode);
@@ -538,279 +537,287 @@ namespace Life
         /// <param name="birthLastValue"></param>
         public static void SurvivalAndBirth(string[] args, int index, ref List<int> survivalConstraints,
                                      ref List<int> birthConstraints, ref bool success,
-                                     ref int survivalFirstValue, ref int survivalLastValue,
-                                     ref int birthFirstValue, ref int birthLastValue)
+                                     ref string inputSurvival, ref string inputBirth)
         {
             // --survival args
             if (args[index] == "--survival")
             {
                 survivalConstraints.Clear();
 
-                try
-                {
-                    // checking if the range operator is present
-                    if (args[index + 2] == "...")
-                    {
-                        try
-                        {
-                            // checking if survival range values are provided as integrers
-                            if (!int.TryParse(args[index + 1], out survivalFirstValue) && !int.TryParse(args[index + 3], out survivalLastValue))
-                            {
-                                survivalFirstValue = 3;
-                                survivalLastValue = 3;
+                int x = 0;
+                int add = index + x;
 
-                                success = false;
-                                Error.WriteLine("first value and/or last value of survival must be an integer(s)");
+                for (int j = add; j < args.Length - 1; ++j)
+                {
+                    try
+                    {
+                        if (!args[index + x + 1].Contains("--"))
+                        {
+                            inputSurvival += args[index + x + 1] + " ";
+
+                            if (args[x + 1 + x].Contains("..."))
+                            {
+                                int first = int.Parse(args[(x + 1) + x].Split("...")[0]);
+                                int last = int.Parse(args[(x + 1) + x].Split("...")[1]);
+
+                                for (int k = first; k <= last; ++k)
+                                {
+                                    survivalConstraints.Add(k);
+                                }
+
                             }
-                            // if so checking for the boundry conditions
                             else
                             {
-                                // lower bound can't be greater than the upper bound
-                                if (survivalFirstValue > survivalLastValue)
+                                if (int.Parse(args[index + x + 1]) < -1)
                                 {
-                                    survivalFirstValue = 3;
-                                    survivalLastValue = 3;
-
-                                    success = false;
-                                    Error.WriteLine("first value of survival must not be greater than the second value");
+                                    Error.WriteLine("Survival value(s) must be positive integer(s)");
                                 }
-
-                                // lower bound must a positive non-zero integer
-                                else if (survivalFirstValue < 0)
+                                else
                                 {
-                                    survivalFirstValue = 3;
-                                    survivalLastValue = 3;
-
-                                    success = false;
-                                    Error.WriteLine("first value of survival must be a positive non-zero value");
+                                    survivalConstraints.Add(int.Parse(args[index + x + 1]));
                                 }
-                            }
-
-                            // adding the range values to a list of survival integers
-                            for (int i = survivalFirstValue; i <= survivalLastValue; ++i)
-                            {
-                                survivalConstraints.Add(i);
                             }
                         }
-                        // if value is not provided as an interger
-                        catch (InvalidDataException ex)
+                        else
                         {
-                            survivalFirstValue = 3;
-                            survivalLastValue = 3;
-
-                            // adding the range values to a list of survival integers
-                            for (int i = survivalFirstValue; i <= survivalLastValue; ++i)
-                            {
-                                survivalConstraints.Add(i);
-                            }
-
-                            success = false;
-                            Error.WriteLine(ex.Message);
-                            Error.WriteLine("First value of survival must be an integer");
+                            break;
                         }
                     }
-                    // if only a single interger is provided
-                    else
+                    catch (IndexOutOfRangeException ex)
                     {
-                        for (int i = index + 1; i < args.Length; ++i)
-                        {
-                            try
-                            {
-                                // checking if survival value is provided as an integer
-                                if (int.TryParse(args[index + 1], out int survivalValue))
-                                {
+                        survivalConstraints.Add(2);
+                        survivalConstraints.Add(3);
 
-                                    if (!(survivalValue > 0))
-                                    {
-                                        survivalFirstValue = 3;
-                                        survivalLastValue = 3;
-
-                                        success = false;
-                                        Error.WriteLine("survival must be a positive non-zero value");
-                                    }
-                                    else
-                                    {
-                                        survivalFirstValue = survivalValue;
-                                        survivalLastValue = survivalValue;
-                                    }
-
-                                    // adding the range values to a list of survival integers
-                                    for (int j = survivalFirstValue; j <= survivalLastValue; ++j)
-                                    {
-                                        survivalConstraints.Add(i);
-                                    }
-                                }
-                            }
-                            // survival value was not provided as an integer
-                            catch (InvalidDataException ex)
-                            {
-                                survivalFirstValue = 3;
-                                survivalLastValue = 3;
-
-                                // adding the range values to a list of survival integers
-                                for (int j = survivalFirstValue; j <= survivalLastValue; ++j)
-                                {
-                                    survivalConstraints.Add(j);
-                                }
-
-                                success = false;
-                                Error.WriteLine(ex.Message);
-                                Error.WriteLine("survival value must be an integer");
-                            }
-                        }
+                        success = false;
+                        Error.WriteLine(ex.Message);
+                        Error.WriteLine("1 or more survival parameter(s) are missing");
                     }
-                }
-                // survival arguments have not been provided
-                catch (IndexOutOfRangeException ex)
-                {
-                    survivalFirstValue = 3;
-                    survivalLastValue = 3;
-
-                    // adding the range values to a list of survival integers
-                    for (int j = survivalFirstValue; j <= survivalLastValue; ++j)
-                    {
-                        survivalConstraints.Add(j);
-                    }
-
-                    success = false;
-                    Error.WriteLine(ex.Message);
-                    Error.WriteLine("1 survival parameter is missing");
                 }
             }
+
+            //    try
+            //    {
+            //        // checking if the range operator is present
+            //        if (args[index + 1].Contains("..."))
+            //        {
+            //            try
+            //            {
+            //                // checking if survival range values are provided as integrers
+            //                if (!int.TryParse(args[index + 1], out survivalFirstValue) && !int.TryParse(args[index + 3], out survivalLastValue))
+            //                {
+            //                    survivalFirstValue = 3;
+            //                    survivalLastValue = 3;
+
+            //                    success = false;
+            //                    Error.WriteLine("first value and/or last value of survival must be an integer(s)");
+            //                }
+            //                // if so checking for the boundry conditions
+            //                else
+            //                {
+            //                    // lower bound can't be greater than the upper bound
+            //                    if (survivalFirstValue > survivalLastValue)
+            //                    {
+            //                        survivalFirstValue = 3;
+            //                        survivalLastValue = 3;
+
+            //                        success = false;
+            //                        Error.WriteLine("first value of survival must not be greater than the second value");
+            //                    }
+
+            //                    // lower bound must a positive non-zero integer
+            //                    else if (survivalFirstValue < 0)
+            //                    {
+            //                        survivalFirstValue = 3;
+            //                        survivalLastValue = 3;
+
+            //                        success = false;
+            //                        Error.WriteLine("first value of survival must be a positive non-zero value");
+            //                    }
+            //                }
+
+            //                // adding the range values to a list of survival integers
+            //                for (int i = survivalFirstValue; i <= survivalLastValue; ++i)
+            //                {
+            //                    survivalConstraints.Add(i);
+            //                }
+            //            }
+            //            // if value is not provided as an interger
+            //            catch (InvalidDataException ex)
+            //            {
+            //                survivalFirstValue = 3;
+            //                survivalLastValue = 3;
+
+            //                // adding the range values to a list of survival integers
+            //                for (int i = survivalFirstValue; i <= survivalLastValue; ++i)
+            //                {
+            //                    survivalConstraints.Add(i);
+            //                }
+
+            //                success = false;
+            //                Error.WriteLine(ex.Message);
+            //                Error.WriteLine("First value of survival must be an integer");
+            //            }
+            //        }
+            //        // if only a single interger is provided
+            //        else
+            //        {
+            //            for (int i = index + 1; i < args.Length; ++i)
+            //            {
+            //                try
+            //                {
+            //                    // checking if survival value is provided as an integer
+            //                    if (int.TryParse(args[index + 1], out int survivalValue))
+            //                    {
+
+            //                        if (!(survivalValue > 0))
+            //                        {
+            //                            survivalFirstValue = 3;
+            //                            survivalLastValue = 3;
+
+            //                            success = false;
+            //                            Error.WriteLine("survival must be a positive non-zero value");
+            //                        }
+            //                        else
+            //                        {
+            //                            survivalFirstValue = survivalValue;
+            //                            survivalLastValue = survivalValue;
+            //                        }
+
+            //                        // adding the range values to a list of survival integers
+            //                        for (int j = survivalFirstValue; j <= survivalLastValue; ++j)
+            //                        {
+            //                            survivalConstraints.Add(i);
+            //                        }
+            //                    }
+            //                }
+            //                // survival value was not provided as an integer
+            //                catch (InvalidDataException ex)
+            //                {
+            //                    survivalFirstValue = 3;
+            //                    survivalLastValue = 3;
+
+            //                    // adding the range values to a list of survival integers
+            //                    for (int j = survivalFirstValue; j <= survivalLastValue; ++j)
+            //                    {
+            //                        survivalConstraints.Add(j);
+            //                    }
+
+            //                    success = false;
+            //                    Error.WriteLine(ex.Message);
+            //                    Error.WriteLine("survival value must be an integer");
+            //                }
+            //            }
+            //        }
+            //    }
+            //    // survival arguments have not been provided
+            //    catch (IndexOutOfRangeException ex)
+            //    {
+            //        survivalFirstValue = 3;
+            //        survivalLastValue = 3;
+
+            //        // adding the range values to a list of survival integers
+            //        for (int j = survivalFirstValue; j <= survivalLastValue; ++j)
+            //        {
+            //            survivalConstraints.Add(j);
+            //        }
+
+            //        success = false;
+            //        Error.WriteLine(ex.Message);
+            //        Error.WriteLine("1 survival parameter is missing");
+            //    }
+            //}
+            //survivalConstraints.Clear();
+
+            //int param = 0;
+
+            //while (args[index + 1].Substring(0,"--".Length) != "--")
+            //{
+            //    if (args[index + 1].Contains("..."))
+            //    {
+            //        try
+            //        {
+
+            //        }
+
+            //        catch
+            //        {
+
+            //        }
+
+            //    }
+
+            //    else
+            //    {
+            //        try
+            //        {
+            //            if (int.TryParse(args[index + 1], out survivalValue))
+            //            {
+            //                survivalConstraints.Add(survivalValue);
+            //            }
+
+
+            //        }
+
+            //    }
+
+
+            //    ++param;
+            //}
+
+
 
             // --birth args
             if (args[index] == "--birth")
             {
                 birthConstraints.Clear();
 
-                try
-                {
-                    // checking if the range operator is present
-                    if (args[index + 2] == "...")
-                    {
-                        try
-                        {
-                            // checking if birth range values are provided as integrers
-                            if (!int.TryParse(args[index + 1], out birthFirstValue) && !int.TryParse(args[index + 3], out birthLastValue))
-                            {
-                                birthFirstValue = 3;
-                                birthLastValue = 3;
+                int x = 0;
+                int add = index + x;
 
-                                success = false;
-                                Error.WriteLine("first value and/or last value of birth must be an integer(s)");
+                for (int j = add; j < args.Length - 1; ++j)
+                {
+                    try
+                    {
+                        if (!args[index + x + 1].Contains("--"))
+                        {
+                            inputBirth += args[index + x + 1] + " ";
+
+                            if (args[x + 1 + x].Contains("..."))
+                            {
+                                int first = int.Parse(args[(x + 1) + x].Split("...")[0]);
+                                int last = int.Parse(args[(x + 1) + x].Split("...")[1]);
+
+                                for (int k = first; k <= last; ++k)
+                                {
+                                    birthConstraints.Add(k);
+                                }
+
                             }
-                            // if so checking for the boundry conditions
                             else
                             {
-                                // lower bound can't be greater than the upper bound
-                                if (birthFirstValue > birthLastValue)
+                                if (int.Parse(args[index + x + 1]) < -1)
                                 {
-                                    birthFirstValue = 3;
-                                    birthLastValue = 3;
-
-                                    success = false;
-                                    Error.WriteLine("first value of birth must not be greater than the second value");
+                                    Error.WriteLine("Birth value(s) must be a positive integer");
                                 }
-
-                                // lower bound must a positive non-zero integer
-                                else if (birthFirstValue < 0)
+                                else
                                 {
-                                    birthFirstValue = 3;
-                                    birthLastValue = 3;
-
-                                    success = false;
-                                    Error.WriteLine("first value of birth must be a positive non-zero value");
+                                    birthConstraints.Add(int.Parse(args[index + x + 1]));
                                 }
-                            }
-
-                            // adding the range values to a list of birth integers
-                            for (int i = birthFirstValue; i <= birthLastValue; ++i)
-                            {
-                                birthConstraints.Add(i);
                             }
                         }
-                        // if value is not provided as an interger
-                        catch (InvalidDataException ex)
+                        else
                         {
-                            birthFirstValue = 3;
-                            birthLastValue = 3;
-
-                            // adding the range values to a list of birth integers
-                            for (int i = birthFirstValue; i <= birthLastValue; ++i)
-                            {
-                                birthConstraints.Add(i);
-                            }
-
-                            success = false;
-                            Error.WriteLine(ex.Message);
-                            Error.WriteLine("First value of birth must be an integer");
+                            break;
                         }
                     }
-                    // if only a single interger is provided
-                    else
+                    catch (IndexOutOfRangeException ex)
                     {
-                        for (int i = index + 1; i < args.Length; ++i)
-                        {
-                            try
-                            {
-                                // checking if birth value is provided as an integer
-                                if (int.TryParse(args[index + 1], out int birthValue))
-                                {
-                                    if (!(birthValue > 0))
-                                    {
-                                        birthFirstValue = 3;
-                                        birthLastValue = 3;
+                        birthConstraints.Add(3);
 
-                                        success = false;
-                                        Error.WriteLine("birth must be a positive non-zero value");
-                                    }
-                                    else
-                                    {
-                                        birthFirstValue = birthValue;
-                                        birthLastValue = birthValue;
-                                    }
-
-                                    // adding the range values to a list of birth integers
-                                    for (int j = birthFirstValue; j <= birthLastValue; ++j)
-                                    {
-                                        birthConstraints.Add(i);
-                                    }
-                                }
-                            }
-                            // birth value was not provided as an integer
-                            catch (InvalidDataException ex)
-                            {
-                                birthFirstValue = 3;
-                                birthLastValue = 3;
-
-                                // adding the range values to a list of birth integers
-                                for (int j = birthFirstValue; j <= birthLastValue; ++j)
-                                {
-                                    birthConstraints.Add(j);
-                                }
-
-                                success = false;
-                                Error.WriteLine(ex.Message);
-                                Error.WriteLine("Birth value must be an integer");
-                            }
-                        }
+                        success = false;
+                        Error.WriteLine(ex.Message);
+                        Error.WriteLine("1 or more birth parameter(s) are missing");
                     }
-                }
-                // birth arguments have not been provided
-                catch (IndexOutOfRangeException ex)
-                {
-                    birthFirstValue = 3;
-                    birthLastValue = 3;
-
-                    // adding the range values to a list of birth integers
-                    for (int j = birthFirstValue; j <= birthLastValue; ++j)
-                    {
-                        birthConstraints.Add(j);
-                    }
-
-                    success = false;
-                    Error.WriteLine(ex.Message);
-                    Error.WriteLine("1 birth parameter is missing");
                 }
             }
         }
@@ -2128,19 +2135,23 @@ namespace Life
             bool ghostMode = false;
             int generationalMemory = 200;
             string outputFile = "/Users/chilla/Desktop/game-of-life/outputFile.seed";
-            int survivalFirstValue = 12;
-            int survivalLastValue = 20;
-            int birthFirstValue = 7;
-            int birthLastValue = 8;
+            int survivalFirstValue = 2;
+            int survivalLastValue = 3;
+            int birthFirstValue = 3;
+            int birthLastValue = 3;
             bool isSteady = false;
             bool fileMode = false;
 
-            // steady state queue variable
-            Queue<string> memoryQueue = new Queue<string>();
+            // input survival and birth value string
+            string inputSurvival = "";
+            string inputBirth = "";
 
             // survival and birth list variables
             List<int> survivalConstraints = new List<int>();
             List<int> birthConstraints = new List<int>();
+
+            // steady state queue variable
+            Queue<string> memoryQueue = new Queue<string>();
 
             // success variable
             bool success = true;
@@ -2169,8 +2180,8 @@ namespace Life
                                  ref generations, ref maxUpdateRate, ref stepMode,
                                  ref neighborhoodType, ref neighborhoodOrder, ref centreCount,
                                  ref survivalConstraints, ref birthConstraints, ref ghostMode,
-                                 ref generationalMemory, ref outputFile, ref survivalFirstValue,
-                                 ref survivalLastValue, ref birthFirstValue, ref birthLastValue);
+                                 ref generationalMemory, ref outputFile, ref inputSurvival,
+                                 ref inputBirth);
             }
             
 
