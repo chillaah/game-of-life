@@ -11,28 +11,29 @@ Has no errors or warnings at execution
 
 ## Usage 
 
-Extract zip file
-> Go into *CAB201_2020S2_ProjectPart2_n10454012*
+> Extract zip file
 >
->> Again go into *CAB201_2020S2_ProjectPart2_n10454012*
+>> Go into *CAB201_2020S2_ProjectPart2_n10454012*
 >>
->>> Go into Life
+>>> Again go into *CAB201_2020S2_ProjectPart2_n10454012*
 >>>
->>>> Double click or right click and open *Life.sln* through Visual Studio 2019 
+>>>> Go into Life
 >>>>
->>>>> Click Life on the *Solution Explorer* panel on Visual Studio 2019 
+>>>>> Double click or right click and open *Life.sln* through Visual Studio 2019 
 >>>>>
->>>>>> Double click *Program.cs*
+>>>>>> Click Life on the *Solution Explorer* panel on Visual Studio 2019 
 >>>>>>
->>>>>>> By clicking the green colour triangle button (run button) on the menu bar the program can be executed
+>>>>>>> Double click *Program.cs*
 >>>>>>>
->>>>>>>> The program will run with default setting for now 
+>>>>>>>> By clicking the green colour triangle button (run button) on the menu bar the program can be executed
 >>>>>>>>
->>>>>>>>> To run the program in modified arguments, click Project -> Life Properties
+>>>>>>>>> The program will run with default setting for now 
 >>>>>>>>>
->>>>>>>>>> Go into Debug panel and the args can be modified using the appropriate commands 
+>>>>>>>>>> To run the program in modified arguments, click Project -> Life Properties
 >>>>>>>>>>
->>>>>>>>>>> Press F5 to execute to custom arguments  
+>>>>>>>>>>> Go into Debug panel and the args can be modified using the appropriate commands 
+>>>>>>>>>>>
+>>>>>>>>>>>> Press F5 to execute to custom arguments  
 
 ## Notes 
 
